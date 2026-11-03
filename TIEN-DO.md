@@ -3,11 +3,13 @@
 Fork: https://github.com/dinhviethoang/rustdesk (gốc: rustdesk/rustdesk, AGPL-3.0)
 
 ## Đã xong
+- 04/11: Mặc định bật direct-server=Y, verification-method=use-permanent-password, approve-mode=password (DEFAULT_SETTINGS trong load_custom_client; code do Gemini web viết, Claude kiểm tra).
 - 2026-11-03: Đổi tên app thành KinG-Remote (APP_NAME đặt trong src/common.rs load_custom_client, không sửa submodule; metadata Cargo.toml, Runner.rc, main.cpp, macOS, Android). Giữ nguyên tên file rustdesk.exe/librustdesk để workflow build chạy.
 - 2026-11-03: Thay 49 icon từ branding/logo-king-goc.png bằng branding/tao-icon.py (chạy lại khi đổi logo).
 - 2026-11-03: Fork repo về GitHub dinhviethoang, clone (shallow, kèm submodule libs/hbb_common) về đây.
 
 ## Đang dở
+- 04/11: build #3 (run 41681411560, commit d006ffd = icon trong suốt + mặc định direct-server/mật khẩu cố định) đang chạy. Build #2 đã chứng minh bản Windows x86_64 + Android build OK.
 - 04/11: icon đã tách nền trong suốt (commit d5a3a2e, đã push). Build #2 đang chạy dùng icon CŨ (nền trắng) → khi xong phải chạy lại Flutter Nightly trên king-remote.
 - Build GitHub Actions run 41671568005 (nightly, nhánh king-remote) đang chạy từ 23:11 03/11.
 - Quy ước: việc thực thi GIAO agy, Claude chỉ hướng dẫn/kiểm tra. agy hết quota: chế độ --code/--write (Opus) hồi ~06:45 04/11; chế độ đọc (Flash) hồi ~01:30 07/11 → dùng `agy --code` cho việc đọc/kiểm tra. Codex hồi 17/11.
