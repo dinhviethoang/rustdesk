@@ -2493,6 +2493,8 @@ pub fn rustdesk_interval(i: Interval) -> ThrottledInterval {
 }
 
 pub fn load_custom_client() {
+    // KinG-Remote: tên app riêng, đặt ở đây để không phải sửa submodule hbb_common.
+    *config::APP_NAME.write().unwrap() = "KinG-Remote".to_owned();
     #[cfg(debug_assertions)]
     if let Ok(data) = std::fs::read_to_string("./custom.txt") {
         read_custom_client(data.trim());
