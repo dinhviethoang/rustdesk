@@ -12,7 +12,7 @@ Fork: https://github.com/dinhviethoang/rustdesk (gốc: rustdesk/rustdesk, AGPL-
 - 04/11: build #3 (run 41681411560, commit d006ffd = icon trong suốt + mặc định direct-server/mật khẩu cố định) đang chạy. Build #2 đã chứng minh bản Windows x86_64 + Android build OK.
 - 04/11: icon đã tách nền trong suốt (commit d5a3a2e, đã push). Build #2 đang chạy dùng icon CŨ (nền trắng) → khi xong phải chạy lại Flutter Nightly trên king-remote.
 - Build GitHub Actions run 41671568005 (nightly, nhánh king-remote) đang chạy từ 23:11 03/11.
-- Quy ước: việc thực thi GIAO agy, Claude chỉ hướng dẫn/kiểm tra. agy hết quota: chế độ --code/--write (Opus) hồi ~06:45 04/11; chế độ đọc (Flash) hồi ~01:30 07/11 → dùng `agy --code` cho việc đọc/kiểm tra. Codex hồi 17/11.
+- Quy ước: việc thực thi GIAO agy, Claude chỉ hướng dẫn/kiểm tra. 04/11 ~01:00: agy Flash (low/medium/high) DÙNG ĐƯỢC; Opus hết đến ~07:15 04/11 → việc code dùng `agy --write --model gemini-3.8-flash-high`. Codex hồi 17/11. Gemini CLI: Google chặn đăng nhập tài khoản cá nhân, chỉ chạy với API key (chưa tạo).
 
 ## Việc tiếp theo
 - Sau build: tải artifact Windows + Android, cài thử; tắt workflow Flutter Nightly (lịch đêm chạy master).
