@@ -2495,6 +2495,13 @@ pub fn rustdesk_interval(i: Interval) -> ThrottledInterval {
 pub fn load_custom_client() {
     // KinG-Remote: tên app riêng, đặt ở đây để không phải sửa submodule hbb_common.
     *config::APP_NAME.write().unwrap() = "KinG-Remote".to_owned();
+    // Thiết lập cấu hình mặc định nếu chưa tồn tại
+    {
+        let mut settings = config::DEFAULT_SETTINGS.write().unwrap();
+        settings.entry("direct-server".to_owned()).or_insert_with(|| "Y".to_owned());
+        settings.entry("verification-method".to_owned()).or_insert_with(|| "use-permanent-password".to_owned());
+        settings.entry("approve-mode".to_owned()).or_insert_with(|| "password".to_owned());
+    }
     #[cfg(debug_assertions)]
     if let Ok(data) = std::fs::read_to_string("./custom.txt") {
         read_custom_client(data.trim());
