@@ -8,9 +8,12 @@ Fork: https://github.com/dinhviethoang/rustdesk (gốc: rustdesk/rustdesk, AGPL-
 - 2026-11-03: Fork repo về GitHub dinhviethoang, clone (shallow, kèm submodule libs/hbb_common) về đây.
 
 ## Đang dở
-- Nhánh king-remote đã commit local, CHƯA push lên GitHub, CHƯA build thử.
+- Build GitHub Actions run 41671568005 (nightly, nhánh king-remote) đang chạy từ 23:11 03/11.
+- Quy ước: việc thực thi GIAO agy, Claude chỉ hướng dẫn/kiểm tra. agy hết quota: chế độ --code/--write (Opus) hồi ~06:45 04/11; chế độ đọc (Flash) hồi ~01:30 07/11 → dùng `agy --code` cho việc đọc/kiểm tra. Codex hồi 17/11.
 
 ## Việc tiếp theo
+- [agy --code] Xem icon đã thay có ĐẠT không (res/128x128.png, mipmap-xxxhdpi/ic_launcher*.png, ic_stat_logo.png, mac-tray-*.png).
+- Sau build: tải artifact Windows + Android, cài thử; tắt workflow Flutter Nightly (lịch đêm chạy master).
 - Push nhánh king-remote, chạy GitHub Actions flutter-build.yml, cài thử bản Windows.
 - Tuỳ chỉnh tiếp: màu, cài đặt mặc định (direct IP, mật khẩu cố định), ẩn/thêm tính năng.
 - Giao codex/agy sửa code; build bằng GitHub Actions (flutter-build.yml).
