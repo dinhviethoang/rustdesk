@@ -7,10 +7,38 @@ import base64
 import io
 from pathlib import Path
 
-from PIL import Image
+import numpy as np
+from PIL import Image, ImageDraw
 
 ROOT = Path(__file__).resolve().parent.parent
-LOGO = Image.open(ROOT / "branding" / "logo-king-goc.png").convert("RGBA")
+
+
+def xoa_nen(img, tol=30):
+    """Biến nền trắng ngà liền với mép ảnh thành trong suốt, làm mềm mép, rồi cắt sát logo."""
+    arr = np.asarray(img.convert("RGB")).astype(np.float32)
+    border = np.concatenate([arr[0], arr[-1], arr[:, 0], arr[:, -1]])
+    bg = np.median(border, axis=0)
+    dist = np.abs(arr - bg).max(axis=2)
+    # Chỉ xoá vùng gần màu nền nối liền với mép (giữ phần trắng bên trong logo).
+    cand = Image.fromarray(((dist < tol * 2) * 255).astype(np.uint8))
+    pad = Image.new("L", (cand.width + 2, cand.height + 2), 255)
+    pad.paste(cand, (1, 1))
+    ImageDraw.floodfill(pad, (0, 0), 128)
+    noi_mep = np.asarray(pad)[1:-1, 1:-1] == 128
+    a = np.where(noi_mep, np.clip((dist - tol) / tol, 0, 1), 1.0)
+    # Trừ màu nền khỏi điểm bán trong suốt để không còn viền trắng.
+    safe = np.maximum(a, 1e-3)[..., None]
+    rgb = np.clip((arr - bg * (1 - a[..., None])) / safe, 0, 255)
+    out = Image.fromarray(np.dstack([rgb, a * 255]).astype(np.uint8), "RGBA")
+    bbox = out.getchannel("A").point(lambda v: 255 if v > 8 else 0).getbbox()
+    out = out.crop(bbox)
+    side = int(max(out.size) * 1.04)
+    sq = Image.new("RGBA", (side, side), (0, 0, 0, 0))
+    sq.paste(out, ((side - out.width) // 2, (side - out.height) // 2))
+    return sq
+
+
+LOGO = xoa_nen(Image.open(ROOT / "branding" / "logo-king-goc.png"))
 ICO_SIZES = [(16, 16), (24, 24), (32, 32), (48, 48), (64, 64), (128, 128), (256, 256)]
 
 
