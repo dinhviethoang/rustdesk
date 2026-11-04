@@ -15,7 +15,7 @@ Fork: https://github.com/dinhviethoang/rustdesk (gốc: rustdesk/rustdesk, AGPL-
 
 ## Việc tiếp theo
 - Người dùng cài thử theo HUONG-DAN-CAI-DAT.md (máy 24/24 .msi + Tailscale, điện thoại .apk).
-- Cân nhắc tắt lịch đêm của Flutter Nightly (cron build nhánh master gốc, ghi đè release nightly).
+- 04/11: workflow Flutter Nightly đã tắt (Disabled manually). Muốn build lại: Actions → Flutter Nightly Build → Enable workflow → Run workflow trên nhánh king-remote.
 - Tuỳ chỉnh tiếp: màu, cài đặt mặc định (direct IP, mật khẩu cố định), ẩn/thêm tính năng.
 - Giao codex/agy sửa code; build bằng GitHub Actions (flutter-build.yml).
 - Máy 24/24: cài app + Tailscale, remote qua IP 100.x.x.x.
