@@ -3,6 +3,7 @@
 Fork: https://github.com/dinhviethoang/rustdesk (gốc: rustdesk/rustdesk, AGPL-3.0)
 
 ## Đã xong
+- 04/11: Đổi tên toàn bộ phần người dùng thấy (commit 8b9f69c, build #4 run 41771477710 OK trừ macOS): file KinG-Remote-1.5.1-*.exe/.msi/.apk, MSI --app-name KinG-Remote (thư mục cài, dịch vụ, gỡ cài đặt), Android applicationId com.king.remote, tiêu đề cửa sổ. Claude tự làm vì agy/codex hết quota cả tuần. Workflow Nightly đã tắt lại. Trên release vẫn còn file rustdesk-* cũ (người dùng tự xoá nếu muốn).
 - 04/11: Build #3 (run 41681411560, commit d006ffd) xong: Windows .exe/.msi + Android .apk mới (icon trong suốt + mặc định) trên release nightly. Chỉ macOS lỗi (không cần). Đã push 861a451.
 - 04/11: HUONG-DAN-CAI-DAT.md (agy Flash High viết, Claude kiểm tra): tải file, máy 24/24, máy tính khác, Android, iPhone, sự cố.
 - 04/11: Mặc định bật direct-server=Y, verification-method=use-permanent-password, approve-mode=password (DEFAULT_SETTINGS trong load_custom_client; code do Gemini web viết, Claude kiểm tra).
