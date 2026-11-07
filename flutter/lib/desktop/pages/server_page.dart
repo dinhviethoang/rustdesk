@@ -5,6 +5,7 @@ import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_hbb/common/widgets/audio_input.dart';
+import 'package:flutter_hbb/common/widgets/cyber_widgets.dart';
 import 'package:flutter_hbb/consts.dart';
 import 'package:flutter_hbb/desktop/widgets/tabbar_widget.dart';
 import 'package:flutter_hbb/models/chat_model.dart';
@@ -94,8 +95,22 @@ class _DesktopServerPageState extends State<DesktopServerPage>
       child: Consumer<ServerModel>(
         builder: (context, serverModel, child) {
           final body = Scaffold(
-            backgroundColor: Theme.of(context).colorScheme.background,
-            body: ConnectionManager(),
+            backgroundColor: const Color(0xFF04070B),
+            body: Stack(
+              children: [
+                const Positioned.fill(
+                  child: CyberGridBackground(
+                    gridSize: 20.0,
+                    backgroundColor: Color(0xFF04070B),
+                    gridColor: Color(0x1F00E5FF),
+                  ),
+                ),
+                ConnectionManager(),
+                const Positioned.fill(
+                  child: CyberScanLine(),
+                ),
+              ],
+            ),
           );
           return isLinux
               ? buildVirtualWindowFrame(context, body)
@@ -104,7 +119,7 @@ class _DesktopServerPageState extends State<DesktopServerPage>
                   Container(
                     decoration: BoxDecoration(
                         border:
-                            Border.all(color: MyTheme.color(context).border!)),
+                            Border.all(color: const Color(0xFF12303A))),
                     child: body,
                   ));
         },
@@ -189,7 +204,17 @@ class ConnectionManagerState extends State<ConnectionManager>
               buildTitleBar(),
               Expanded(
                 child: Center(
-                  child: Text(translate("Waiting")),
+                  child: Text(
+                    translate("Waiting"),
+                    style: TextStyle(
+                      color: const Color(0xFF5C7A86),
+                      fontFamily: MyTheme.monoFontFamily,
+                      fontFamilyFallback: MyTheme.monoFontFamilyFallback,
+                      letterSpacing: 2.5,
+                      fontSize: 12.0,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
                 ),
               ),
             ],
@@ -204,7 +229,9 @@ class ConnectionManagerState extends State<ConnectionManager>
               showClose: true,
               onWindowCloseButton: handleWindowCloseButton,
               controller: serverModel.tabController,
-              selectedBorderColor: MyTheme.accent,
+              selectedBorderColor: const Color(0xFF00E5FF),
+              selectedTabBackgroundColor: const Color(0xFF070D14),
+              unSelectedTabBackgroundColor: Colors.transparent,
               maxLabelWidth: 100,
               tail: null, //buildScrollJumper(),
               tabBuilder: (key, icon, label, themeConf) {
@@ -213,10 +240,30 @@ class ConnectionManagerState extends State<ConnectionManager>
                 return Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
+                    Container(
+                      width: 6.0,
+                      height: 6.0,
+                      margin: const EdgeInsets.only(right: 6.0),
+                      decoration: const BoxDecoration(
+                        color: Color(0xFF00E5FF),
+                        shape: BoxShape.rectangle,
+                      ),
+                    ),
                     Tooltip(
-                        message: key,
-                        waitDuration: Duration(seconds: 1),
-                        child: label),
+                      message: key,
+                      waitDuration: const Duration(seconds: 1),
+                      child: DefaultTextStyle(
+                        style: TextStyle(
+                          color: const Color(0xFF00E5FF),
+                          fontSize: 11.0,
+                          letterSpacing: 1.5,
+                          fontFamily: MyTheme.monoFontFamily,
+                          fontFamilyFallback: MyTheme.monoFontFamilyFallback,
+                          fontWeight: FontWeight.w600,
+                        ),
+                        child: label,
+                      ),
+                    ),
                     unreadMessageCountBuilder(client?.unreadChatMessageCount)
                         .marginOnly(left: 4),
                   ],
@@ -267,7 +314,7 @@ class ConnectionManagerState extends State<ConnectionManager>
                                   ))),
                   ]);
                   return Container(
-                    color: Theme.of(context).scaffoldBackgroundColor,
+                    color: Colors.transparent,
                     child: row,
                   );
                 },
@@ -306,7 +353,7 @@ class ConnectionManagerState extends State<ConnectionManager>
                 windowManager.startDragging();
               },
               child: Container(
-                color: Theme.of(context).colorScheme.background,
+                color: Colors.transparent,
               ),
             ),
           ),
@@ -368,11 +415,12 @@ Widget buildConnectionCard(Client client) {
       key: ValueKey(client.id),
       children: [
         _CmHeader(client: client),
+        const SizedBox(height: 10.0),
         client.type_() == ClientType.file ||
                 client.type_() == ClientType.portForward ||
                 client.type_() == ClientType.terminal ||
                 client.disconnected
-            ? Offstage()
+            ? const SizedBox()
             : _PrivilegeBoard(client: client),
         Expanded(
           child: Align(
@@ -381,7 +429,7 @@ Widget buildConnectionCard(Client client) {
           ),
         )
       ],
-    ).paddingSymmetric(vertical: 4.0, horizontal: 8.0),
+    ).paddingSymmetric(vertical: 8.0, horizontal: 8.0),
   );
 }
 
@@ -391,7 +439,7 @@ class _AppIcon extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      margin: EdgeInsets.symmetric(horizontal: 4.0),
+      margin: const EdgeInsets.symmetric(horizontal: 4.0),
       child: loadIcon(30),
     );
   }
@@ -407,8 +455,9 @@ class _CloseButton extends StatelessWidget {
         windowManager.close();
       },
       icon: const Icon(
-        IconFont.close,
-        size: 18,
+        Icons.close,
+        size: 16,
+        color: Color(0xFF5C7A86),
       ),
       splashColor: Colors.transparent,
       hoverColor: Colors.transparent,
@@ -435,7 +484,7 @@ class _CmHeaderState extends State<_CmHeader>
   @override
   void initState() {
     super.initState();
-    _timer = Timer.periodic(Duration(seconds: 1), (_) {
+    _timer = Timer.periodic(const Duration(seconds: 1), (_) {
       if (client.authorized && !client.disconnected) {
         _time.value = _time.value + 1;
       }
@@ -455,125 +504,154 @@ class _CmHeaderState extends State<_CmHeader>
   @override
   Widget build(BuildContext context) {
     super.build(context);
-    return Container(
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(10.0),
-        gradient: LinearGradient(
-          begin: Alignment.topRight,
-          end: Alignment.bottomLeft,
-          colors: [
-            Color(0xff00bfe1),
-            Color(0xff0071ff),
-          ],
-        ),
-      ),
-      margin: EdgeInsets.symmetric(horizontal: 5.0, vertical: 10.0),
-      padding: EdgeInsets.only(
-        top: 10.0,
-        bottom: 10.0,
-        left: 10.0,
-        right: 5.0,
-      ),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
+
+    final Color dotColor;
+    final String statusText;
+    if (client.authorized) {
+      if (client.disconnected) {
+        dotColor = const Color(0xFFFF3B5C);
+        statusText = translate("Disconnected").toUpperCase();
+      } else {
+        dotColor = const Color(0xFF00FF9F);
+        statusText = 'LINKED';
+      }
+    } else {
+      dotColor = const Color(0xFFFFB020);
+      statusText = '${translate("Request access to your device")}...'.toUpperCase();
+    }
+
+    return CyberFrame(
+      padding: const EdgeInsets.all(12.0),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          _buildClientAvatar().marginOnly(right: 10.0),
-          Expanded(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.start,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                FittedBox(
-                    child: Text(
-                  client.name,
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontWeight: FontWeight.bold,
-                    fontSize: 20,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                  maxLines: 1,
-                )),
-                FittedBox(
-                  child: Text(
-                    "(${client.peerId})",
-                    style: TextStyle(color: Colors.white, fontSize: 14),
-                  ),
-                ),
-                if (client.type_() == ClientType.terminal)
-                  FittedBox(
-                    child: Text(
-                      translate("Terminal"),
-                      style: TextStyle(color: Colors.white70, fontSize: 12),
-                    ),
-                  ),
-                if (client.type_() == ClientType.file)
-                  FittedBox(
-                    child: Text(
-                      translate("Transfer file"),
-                      style: TextStyle(color: Colors.white70, fontSize: 12),
-                    ),
-                  ),
-                if (client.type_() == ClientType.camera)
-                  FittedBox(
-                    child: Text(
-                      translate("View camera"),
-                      style: TextStyle(color: Colors.white70, fontSize: 12),
-                    ),
-                  ),
-                if (client.portForward.isNotEmpty)
-                  FittedBox(
-                    child: Text(
-                      "Port Forward: ${client.portForward}",
-                      style: TextStyle(color: Colors.white70, fontSize: 12),
-                    ),
-                  ),
-                SizedBox(height: 10.0),
-                FittedBox(
-                    child: Row(
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              _buildClientAvatar(),
+              const SizedBox(width: 12.0),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisSize: MainAxisSize.min,
                   children: [
                     Text(
-                      client.authorized
-                          ? client.disconnected
-                              ? translate("Disconnected")
-                              : translate("Connected")
-                          : "${translate("Request access to your device")}...",
-                      style: TextStyle(color: Colors.white),
-                    ).marginOnly(right: 8.0),
-                    if (client.authorized)
-                      Obx(
-                        () => Text(
-                          formatDurationToTime(
-                            Duration(seconds: _time.value),
-                          ),
-                          style: TextStyle(color: Colors.white),
+                      client.name.toUpperCase(),
+                      style: TextStyle(
+                        color: const Color(0xFFCFF8FF),
+                        fontWeight: FontWeight.bold,
+                        fontSize: 16.0,
+                        letterSpacing: 2.0,
+                        fontFamily: MyTheme.monoFontFamily,
+                        fontFamilyFallback: MyTheme.monoFontFamilyFallback,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                      maxLines: 1,
+                    ),
+                    const SizedBox(height: 2.0),
+                    CyberLabel(
+                      "NODE ${client.peerId}",
+                      fontSize: 9.0,
+                      letterSpacing: 2.2,
+                      color: const Color(0xFF5C7A86),
+                    ),
+                    if (client.type_() == ClientType.terminal)
+                      Padding(
+                        padding: const EdgeInsets.only(top: 2.0),
+                        child: CyberLabel(
+                          translate("Terminal"),
+                          fontSize: 9.0,
+                          letterSpacing: 1.5,
+                          color: const Color(0xFF5C7A86),
                         ),
-                      )
+                      ),
+                    if (client.type_() == ClientType.file)
+                      Padding(
+                        padding: const EdgeInsets.only(top: 2.0),
+                        child: CyberLabel(
+                          translate("Transfer file"),
+                          fontSize: 9.0,
+                          letterSpacing: 1.5,
+                          color: const Color(0xFF5C7A86),
+                        ),
+                      ),
+                    if (client.type_() == ClientType.camera)
+                      Padding(
+                        padding: const EdgeInsets.only(top: 2.0),
+                        child: CyberLabel(
+                          translate("View camera"),
+                          fontSize: 9.0,
+                          letterSpacing: 1.5,
+                          color: const Color(0xFF5C7A86),
+                        ),
+                      ),
+                    if (client.portForward.isNotEmpty)
+                      Padding(
+                        padding: const EdgeInsets.only(top: 2.0),
+                        child: CyberLabel(
+                          "PORT: ${client.portForward}",
+                          fontSize: 9.0,
+                          letterSpacing: 1.5,
+                          color: const Color(0xFF5C7A86),
+                        ),
+                      ),
+                    const SizedBox(height: 6.0),
+                    Row(
+                      children: [
+                        CyberPulsingDot(color: dotColor),
+                        const SizedBox(width: 6.0),
+                        Flexible(
+                          child: Text(
+                            statusText,
+                            style: TextStyle(
+                              color: dotColor,
+                              fontSize: 11.0,
+                              letterSpacing: 1.5,
+                              fontWeight: FontWeight.w600,
+                              fontFamily: MyTheme.monoFontFamily,
+                              fontFamilyFallback: MyTheme.monoFontFamilyFallback,
+                            ),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ),
+                        const Spacer(),
+                        if (client.authorized && !client.disconnected)
+                          Obx(
+                            () => Text(
+                              formatDurationToTime(
+                                Duration(seconds: _time.value),
+                              ),
+                              style: TextStyle(
+                                color: const Color(0xFF00E5FF),
+                                fontSize: 11.0,
+                                fontFamily: MyTheme.monoFontFamily,
+                                fontFamilyFallback: MyTheme.monoFontFamilyFallback,
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
+                          ),
+                      ],
+                    ),
                   ],
-                ))
-              ],
-            ),
+                ),
+              ),
+              Offstage(
+                offstage: !client.authorized ||
+                    (client.type_() != ClientType.remote &&
+                        client.type_() != ClientType.file &&
+                        client.type_() != ClientType.camera),
+                child: Padding(
+                  padding: const EdgeInsets.only(left: 6.0),
+                  child: _buildChatButton(),
+                ),
+              ),
+            ],
           ),
-          Offstage(
-            offstage: !client.authorized ||
-                (client.type_() != ClientType.remote &&
-                    client.type_() != ClientType.file &&
-                    client.type_() != ClientType.camera),
-            child: IconButton(
-              onPressed: () => checkClickTime(client.id, () {
-                if (client.type_() == ClientType.file) {
-                  gFFI.chatModel.toggleCMFilePage();
-                } else {
-                  gFFI.chatModel
-                      .toggleCMChatPage(MessageKey(client.peerId, client.id));
-                }
-              }),
-              icon: SvgPicture.asset(client.type_() == ClientType.file
-                  ? 'assets/file_transfer.svg'
-                  : 'assets/chat2.svg'),
-              splashRadius: kDesktopIconButtonSplashRadius,
-            ),
-          )
+          const SizedBox(height: 10.0),
+          _buildKeyValueRow('CIPHER', 'E2E', hasBorder: true),
+          _buildKeyValueRow('ROUTE', 'DIRECT', hasBorder: false),
         ],
       ),
     );
@@ -583,31 +661,112 @@ class _CmHeaderState extends State<_CmHeader>
   bool get wantKeepAlive => true;
 
   Widget _buildClientAvatar() {
-    return buildAvatarWidget(
-          avatar: client.avatar,
-          size: 70,
-          borderRadius: 15,
-          fallback: _buildInitialAvatar(),
-        ) ??
-        _buildInitialAvatar();
+    return CyberCutBox(
+      width: 54.0,
+      height: 54.0,
+      cut: 8.0,
+      twoCorners: true,
+      borderColor: const Color(0xFF00E5FF),
+      backgroundColor: const Color(0x1400E5FF),
+      glow: true,
+      child: buildAvatarWidget(
+            avatar: client.avatar,
+            size: 54.0,
+            borderRadius: 0,
+            fallback: _buildInitialAvatar(),
+          ) ??
+          _buildInitialAvatar(),
+    );
   }
 
   Widget _buildInitialAvatar() {
-    return Container(
-      width: 70,
-      height: 70,
-      alignment: Alignment.center,
-      decoration: BoxDecoration(
-        color: str2color(client.name),
-        borderRadius: BorderRadius.circular(15.0),
-      ),
+    return Center(
       child: Text(
-        client.name.isNotEmpty ? client.name[0] : '?',
+        client.name.isNotEmpty ? client.name[0].toUpperCase() : '?',
         style: TextStyle(
           fontWeight: FontWeight.bold,
-          color: Colors.white,
-          fontSize: 55,
+          color: const Color(0xFF00E5FF),
+          fontSize: 26.0,
+          fontFamily: MyTheme.monoFontFamily,
+          fontFamilyFallback: MyTheme.monoFontFamilyFallback,
         ),
+      ),
+    );
+  }
+
+  Widget _buildChatButton() {
+    return Obx(() {
+      final unread = client.unreadChatMessageCount.value;
+      return Stack(
+        clipBehavior: Clip.none,
+        children: [
+          CyberIcon(
+            icon: client.type_() == ClientType.file
+                ? Icons.folder_outlined
+                : Icons.chat_bubble_outline_rounded,
+            color: const Color(0xFF00E5FF),
+            tooltip: translate(
+                client.type_() == ClientType.file ? "Transfer file" : "Chat"),
+            onTap: () => checkClickTime(client.id, () {
+              if (client.type_() == ClientType.file) {
+                gFFI.chatModel.toggleCMFilePage();
+              } else {
+                gFFI.chatModel
+                    .toggleCMChatPage(MessageKey(client.peerId, client.id));
+              }
+            }),
+          ),
+          if (unread > 0)
+            Positioned(
+              top: -3,
+              right: -3,
+              child: Container(
+                width: 8,
+                height: 8,
+                decoration: const BoxDecoration(
+                  color: Color(0xFFFF3B5C),
+                  shape: BoxShape.circle,
+                ),
+              ),
+            ),
+        ],
+      );
+    });
+  }
+
+  Widget _buildKeyValueRow(String key, String value, {bool hasBorder = true}) {
+    return Container(
+      padding: const EdgeInsets.symmetric(vertical: 5.0),
+      decoration: BoxDecoration(
+        border: hasBorder
+            ? const Border(
+                bottom: BorderSide(
+                  color: Color(0xFF12303A),
+                  width: 1.0,
+                ),
+              )
+            : null,
+      ),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          CyberLabel(
+            key,
+            fontSize: 9.0,
+            letterSpacing: 2.2,
+            color: const Color(0xFF5C7A86),
+          ),
+          Text(
+            value,
+            style: TextStyle(
+              fontSize: 11.0,
+              color: const Color(0xFF00E5FF),
+              fontWeight: FontWeight.w400,
+              fontFamily: MyTheme.monoFontFamily,
+              fontFamilyFallback: MyTheme.monoFontFamilyFallback,
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -624,239 +783,263 @@ class _PrivilegeBoard extends StatefulWidget {
 
 class _PrivilegeBoardState extends State<_PrivilegeBoard> {
   late final client = widget.client;
-  Widget buildPermissionIcon(bool enabled, IconData iconData,
-      Function(bool)? onTap, String tooltipText,
-      {required bool canModify}) {
+
+  Widget _buildPermissionItem({
+    required bool enabled,
+    required IconData iconData,
+    required String label,
+    required String tooltipText,
+    required bool canModify,
+    required Function(bool)? onTap,
+  }) {
+    final activeColor = const Color(0xFF00E5FF);
+    final inactiveColor = const Color(0xFF5C7A86);
+    final borderColor =
+        enabled ? const Color(0x8C00E5FF) : const Color(0xFF12303A);
+    final bgColor =
+        enabled ? const Color(0x1400E5FF) : Colors.transparent;
+    final iconColor = enabled ? activeColor : inactiveColor;
+    final labelColor = enabled ? activeColor : inactiveColor;
+
     return Tooltip(
       message: "$tooltipText: ${enabled ? "ON" : "OFF"}",
       waitDuration: Duration.zero,
-      child: Container(
-        decoration: BoxDecoration(
-          color: enabled
-              ? (canModify ? MyTheme.accent : MyTheme.accent.withOpacity(0.6))
-              : Colors.grey[700],
-          borderRadius: BorderRadius.circular(10.0),
-        ),
-        padding: EdgeInsets.all(8.0),
-        child: InkWell(
-          onTap: canModify
-              ? () =>
-                  checkClickTime(widget.client.id, () => onTap?.call(!enabled))
-              : null,
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.spaceAround,
-            children: [
-              Expanded(
-                child: Icon(
-                  iconData,
-                  color: Colors.white,
-                ),
-              ),
-            ],
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          CyberCutBox(
+            width: 46.0,
+            height: 46.0,
+            cut: 6.0,
+            twoCorners: true,
+            borderColor: borderColor,
+            backgroundColor: bgColor,
+            glow: enabled,
+            onTap: canModify
+                ? () => checkClickTime(
+                    widget.client.id, () => onTap?.call(!enabled))
+                : null,
+            child: Icon(
+              iconData,
+              size: 20.0,
+              color: iconColor,
+            ),
           ),
-        ),
+          const SizedBox(height: 5.0),
+          Text(
+            label.toUpperCase(),
+            style: TextStyle(
+              fontSize: 8.0,
+              letterSpacing: 1.4,
+              color: labelColor,
+              fontWeight: FontWeight.w600,
+              fontFamily: MyTheme.monoFontFamily,
+              fontFamilyFallback: MyTheme.monoFontFamilyFallback,
+            ),
+            maxLines: 1,
+            overflow: TextOverflow.clip,
+            textAlign: TextAlign.center,
+          ),
+        ],
       ),
     );
   }
 
   @override
   Widget build(BuildContext context) {
-    final crossAxisCount = 4;
-    final spacing = 10.0;
     final canModifyPermission =
         bind.mainGetBuildinOption(key: kOptionEnablePermChangeInAcceptWindow) !=
             'N';
-    return Container(
-      width: double.infinity,
-      height: 160.0,
-      margin: EdgeInsets.all(5.0),
-      padding: EdgeInsets.all(5.0),
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(10.0),
-        color: Theme.of(context).colorScheme.background,
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.2),
-            spreadRadius: 1,
-            blurRadius: 1,
-            offset: Offset(0, 1.5),
-          ),
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: [
-          Text(
-            translate("Permissions"),
-            style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-            textAlign: TextAlign.center,
-          ).marginOnly(left: 4.0, bottom: 8.0),
-          Expanded(
-            child: GridView.count(
-              crossAxisCount: crossAxisCount,
-              padding: EdgeInsets.symmetric(horizontal: spacing),
-              mainAxisSpacing: spacing,
-              crossAxisSpacing: spacing,
-              children: client.type_() == ClientType.camera
-                  ? [
-                      buildPermissionIcon(
-                        client.audio,
-                        Icons.volume_up_rounded,
-                        (enabled) {
-                          bind.cmSwitchPermission(
-                              connId: client.id,
-                              name: "audio",
-                              enabled: enabled);
-                          setState(() {
-                            client.audio = enabled;
-                          });
-                        },
-                        translate('Enable audio'),
-                        canModify: canModifyPermission,
-                      ),
-                      buildPermissionIcon(
-                        client.recording,
-                        Icons.videocam_rounded,
-                        (enabled) {
-                          bind.cmSwitchPermission(
-                              connId: client.id,
-                              name: "recording",
-                              enabled: enabled);
-                          setState(() {
-                            client.recording = enabled;
-                          });
-                        },
-                        translate('Enable recording session'),
-                        canModify: canModifyPermission,
-                      ),
-                    ]
-                  : [
-                      buildPermissionIcon(
-                        client.keyboard,
-                        Icons.keyboard,
-                        (enabled) {
-                          bind.cmSwitchPermission(
-                              connId: client.id,
-                              name: "keyboard",
-                              enabled: enabled);
-                          setState(() {
-                            client.keyboard = enabled;
-                          });
-                        },
-                        translate('Enable keyboard/mouse'),
-                        canModify: canModifyPermission,
-                      ),
-                      buildPermissionIcon(
-                        client.clipboard,
-                        Icons.assignment_rounded,
-                        (enabled) {
-                          bind.cmSwitchPermission(
-                              connId: client.id,
-                              name: "clipboard",
-                              enabled: enabled);
-                          setState(() {
-                            client.clipboard = enabled;
-                          });
-                        },
-                        translate('Enable clipboard'),
-                        canModify: canModifyPermission,
-                      ),
-                      buildPermissionIcon(
-                        client.audio,
-                        Icons.volume_up_rounded,
-                        (enabled) {
-                          bind.cmSwitchPermission(
-                              connId: client.id,
-                              name: "audio",
-                              enabled: enabled);
-                          setState(() {
-                            client.audio = enabled;
-                          });
-                        },
-                        translate('Enable audio'),
-                        canModify: canModifyPermission,
-                      ),
-                      buildPermissionIcon(
-                        client.file,
-                        Icons.upload_file_rounded,
-                        (enabled) {
-                          bind.cmSwitchPermission(
-                              connId: client.id,
-                              name: "file",
-                              enabled: enabled);
-                          setState(() {
-                            client.file = enabled;
-                          });
-                        },
-                        translate('Enable file copy and paste'),
-                        canModify: canModifyPermission,
-                      ),
-                      buildPermissionIcon(
-                        client.restart,
-                        Icons.restart_alt_rounded,
-                        (enabled) {
-                          bind.cmSwitchPermission(
-                              connId: client.id,
-                              name: "restart",
-                              enabled: enabled);
-                          setState(() {
-                            client.restart = enabled;
-                          });
-                        },
-                        translate('Enable remote restart'),
-                        canModify: canModifyPermission,
-                      ),
-                      buildPermissionIcon(
-                        client.recording,
-                        Icons.videocam_rounded,
-                        (enabled) {
-                          bind.cmSwitchPermission(
-                              connId: client.id,
-                              name: "recording",
-                              enabled: enabled);
-                          setState(() {
-                            client.recording = enabled;
-                          });
-                        },
-                        translate('Enable recording session'),
-                        canModify: canModifyPermission,
-                      ),
-                      // only windows support block input
-                      if (isWindows)
-                        buildPermissionIcon(
-                          client.blockInput,
-                          Icons.block,
-                          (enabled) {
-                            bind.cmSwitchPermission(
-                                connId: client.id,
-                                name: "block_input",
-                                enabled: enabled);
-                            setState(() {
-                              client.blockInput = enabled;
-                            });
-                          },
-                          translate('Enable blocking user input'),
-                          canModify: canModifyPermission,
-                        ),
-                      if (bind.mainSupportedPrivacyModeImpls() != '[]')
-                        buildPermissionIcon(
-                          client.privacyMode,
-                          Icons.visibility_off,
-                          (enabled) {
-                            bind.cmSwitchPermission(
-                                connId: client.id,
-                                name: "privacy_mode",
-                                enabled: enabled);
-                            setState(() {
-                              client.privacyMode = enabled;
-                            });
-                          },
-                          translate('Enable privacy mode'),
-                          canModify: canModifyPermission,
-                        )
-                    ],
+
+    final List<Widget> items = client.type_() == ClientType.camera
+        ? [
+            _buildPermissionItem(
+              enabled: client.audio,
+              iconData: Icons.volume_up_outlined,
+              label: 'AUDIO',
+              tooltipText: translate('Enable audio'),
+              canModify: canModifyPermission,
+              onTap: (enabled) {
+                bind.cmSwitchPermission(
+                    connId: client.id, name: "audio", enabled: enabled);
+                setState(() {
+                  client.audio = enabled;
+                });
+              },
             ),
+            _buildPermissionItem(
+              enabled: client.recording,
+              iconData: Icons.videocam_outlined,
+              label: 'REC',
+              tooltipText: translate('Enable recording session'),
+              canModify: canModifyPermission,
+              onTap: (enabled) {
+                bind.cmSwitchPermission(
+                    connId: client.id, name: "recording", enabled: enabled);
+                setState(() {
+                  client.recording = enabled;
+                });
+              },
+            ),
+          ]
+        : [
+            _buildPermissionItem(
+              enabled: client.keyboard,
+              iconData: Icons.keyboard_outlined,
+              label: 'INPUT',
+              tooltipText: translate('Enable keyboard/mouse'),
+              canModify: canModifyPermission,
+              onTap: (enabled) {
+                bind.cmSwitchPermission(
+                    connId: client.id, name: "keyboard", enabled: enabled);
+                setState(() {
+                  client.keyboard = enabled;
+                });
+              },
+            ),
+            _buildPermissionItem(
+              enabled: client.clipboard,
+              iconData: Icons.assignment_outlined,
+              label: 'CLIP',
+              tooltipText: translate('Enable clipboard'),
+              canModify: canModifyPermission,
+              onTap: (enabled) {
+                bind.cmSwitchPermission(
+                    connId: client.id, name: "clipboard", enabled: enabled);
+                setState(() {
+                  client.clipboard = enabled;
+                });
+              },
+            ),
+            _buildPermissionItem(
+              enabled: client.audio,
+              iconData: Icons.volume_up_outlined,
+              label: 'AUDIO',
+              tooltipText: translate('Enable audio'),
+              canModify: canModifyPermission,
+              onTap: (enabled) {
+                bind.cmSwitchPermission(
+                    connId: client.id, name: "audio", enabled: enabled);
+                setState(() {
+                  client.audio = enabled;
+                });
+              },
+            ),
+            _buildPermissionItem(
+              enabled: client.file,
+              iconData: Icons.upload_file_outlined,
+              label: 'FILES',
+              tooltipText: translate('Enable file copy and paste'),
+              canModify: canModifyPermission,
+              onTap: (enabled) {
+                bind.cmSwitchPermission(
+                    connId: client.id, name: "file", enabled: enabled);
+                setState(() {
+                  client.file = enabled;
+                });
+              },
+            ),
+            _buildPermissionItem(
+              enabled: client.restart,
+              iconData: Icons.restart_alt,
+              label: 'REBOOT',
+              tooltipText: translate('Enable remote restart'),
+              canModify: canModifyPermission,
+              onTap: (enabled) {
+                bind.cmSwitchPermission(
+                    connId: client.id, name: "restart", enabled: enabled);
+                setState(() {
+                  client.restart = enabled;
+                });
+              },
+            ),
+            _buildPermissionItem(
+              enabled: client.recording,
+              iconData: Icons.videocam_outlined,
+              label: 'REC',
+              tooltipText: translate('Enable recording session'),
+              canModify: canModifyPermission,
+              onTap: (enabled) {
+                bind.cmSwitchPermission(
+                    connId: client.id, name: "recording", enabled: enabled);
+                setState(() {
+                  client.recording = enabled;
+                });
+              },
+            ),
+            if (isWindows)
+              _buildPermissionItem(
+                enabled: client.blockInput,
+                iconData: Icons.block,
+                label: 'BLOCK',
+                tooltipText: translate('Enable blocking user input'),
+                canModify: canModifyPermission,
+                onTap: (enabled) {
+                  bind.cmSwitchPermission(
+                      connId: client.id,
+                      name: "block_input",
+                      enabled: enabled);
+                  setState(() {
+                    client.blockInput = enabled;
+                  });
+                },
+              ),
+            if (bind.mainSupportedPrivacyModeImpls() != '[]')
+              _buildPermissionItem(
+                enabled: client.privacyMode,
+                iconData: Icons.visibility_off_outlined,
+                label: 'PRIVACY',
+                tooltipText: translate('Enable privacy mode'),
+                canModify: canModifyPermission,
+                onTap: (enabled) {
+                  bind.cmSwitchPermission(
+                      connId: client.id,
+                      name: "privacy_mode",
+                      enabled: enabled);
+                  setState(() {
+                    client.privacyMode = enabled;
+                  });
+                },
+              ),
+          ];
+
+    final List<Widget> rows = [];
+    for (int i = 0; i < items.length; i += 4) {
+      final chunk = items.sublist(i, min(i + 4, items.length));
+      rows.add(
+        Row(
+          children: [
+            for (final it in chunk)
+              Expanded(
+                child: Center(child: it),
+              ),
+            for (int pad = 0; pad < 4 - chunk.length; pad++)
+              const Expanded(
+                child: SizedBox(),
+              ),
+          ],
+        ),
+      );
+      if (i + 4 < items.length) {
+        rows.add(const SizedBox(height: 12.0));
+      }
+    }
+
+    return CyberFrame(
+      padding: const EdgeInsets.symmetric(horizontal: 10.0, vertical: 12.0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          const CyberLabel(
+            '// PERMISSIONS',
+            color: Color(0xFF00E5FF),
+            fontSize: 9.0,
+            letterSpacing: 2.2,
           ),
+          const SizedBox(height: 10.0),
+          ...rows,
         ],
       ),
     );
@@ -898,7 +1081,8 @@ class _CmControlPanel extends StatelessWidget {
                     onClick: null, onTapDown: (details) async {
                   final devicesInfo =
                       await AudioInput.getDevicesInfo(true, true);
-                  List<String> devices = devicesInfo['devices'] as List<String>;
+                  List<String> devices =
+                      devicesInfo['devices'] as List<String>;
                   if (devices.isEmpty) {
                     msgBox(
                       gFFI.sessionId,
@@ -923,14 +1107,16 @@ class _CmControlPanel extends StatelessWidget {
                               value: d,
                               height: 18,
                               padding: EdgeInsets.zero,
-                              onTap: () => AudioInput.setDevice(d, true, true),
+                              onTap: () =>
+                                  AudioInput.setDevice(d, true, true),
                               child: IgnorePointer(
                                   child: RadioMenuButton(
                                 value: d,
                                 groupValue: currentDevice,
                                 onChanged: (v) {
-                                  if (v != null)
+                                  if (v != null) {
                                     AudioInput.setDevice(v, true, true);
+                                  }
                                 },
                                 child: Container(
                                   child: Text(
@@ -949,26 +1135,23 @@ class _CmControlPanel extends StatelessWidget {
                         .toList(),
                   );
                 },
-                    icon: Icon(
+                    icon: const Icon(
                       Icons.call_rounded,
-                      color: Colors.white,
                       size: 14,
                     ),
-                    text: "Audio input",
-                    textColor: Colors.white),
+                    text: "Audio input"),
               ),
               Expanded(
                 child: buildButton(
                   context,
                   color: Colors.red,
                   onClick: () => closeVoiceCall(),
-                  icon: Icon(
+                  icon: const Icon(
                     Icons.call_end_rounded,
-                    color: Colors.white,
                     size: 14,
                   ),
                   text: "Stop voice call",
-                  textColor: Colors.white,
+                  danger: true,
                 ),
               )
             ],
@@ -982,26 +1165,23 @@ class _CmControlPanel extends StatelessWidget {
                 child: buildButton(context,
                     color: MyTheme.accent,
                     onClick: () => handleVoiceCall(true),
-                    icon: Icon(
+                    icon: const Icon(
                       Icons.call_rounded,
-                      color: Colors.white,
                       size: 14,
                     ),
-                    text: "Accept",
-                    textColor: Colors.white),
+                    text: "Accept"),
               ),
               Expanded(
                 child: buildButton(
                   context,
                   color: Colors.red,
                   onClick: () => handleVoiceCall(false),
-                  icon: Icon(
+                  icon: const Icon(
                     Icons.phone_disabled_rounded,
-                    color: Colors.white,
                     size: 14,
                   ),
                   text: "Dismiss",
-                  textColor: Colors.white,
+                  danger: true,
                 ),
               )
             ],
@@ -1012,9 +1192,8 @@ class _CmControlPanel extends StatelessWidget {
           child: buildButton(context,
               color: Colors.purple,
               onClick: () => handleSwitchBack(context),
-              icon: Icon(Icons.reply, color: Colors.white),
-              text: "Switch Sides",
-              textColor: Colors.white),
+              icon: const Icon(Icons.reply, size: 14),
+              text: "Switch Sides"),
         ),
         Offstage(
           offstage: !showElevation,
@@ -1025,28 +1204,23 @@ class _CmControlPanel extends StatelessWidget {
               handleElevate(context);
               windowManager.minimize();
             },
-            icon: Icon(
+            icon: const Icon(
               Icons.security_rounded,
-              color: Colors.white,
               size: 14,
             ),
             text: 'Elevate',
-            textColor: Colors.white,
           ),
         ),
         Row(
           children: [
             Expanded(
-              child: buildButton(context,
-                  color: Colors.redAccent,
-                  onClick: handleDisconnect,
-                  text: 'Disconnect',
-                  icon: Icon(
-                    Icons.link_off_rounded,
-                    color: Colors.white,
-                    size: 14,
-                  ),
-                  textColor: Colors.white),
+              child: buildButton(
+                context,
+                color: Colors.redAccent,
+                onClick: handleDisconnect,
+                text: 'Disconnect',
+                danger: true,
+              ),
             ),
           ],
         )
@@ -1059,11 +1233,13 @@ class _CmControlPanel extends StatelessWidget {
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
         Expanded(
-            child: buildButton(context,
-                color: MyTheme.accent,
-                onClick: handleClose,
-                text: 'Close',
-                textColor: Colors.white)),
+          child: buildButton(
+            context,
+            color: MyTheme.accent,
+            onClick: handleClose,
+            text: 'Close',
+          ),
+        ),
       ],
     ).marginOnly(bottom: buttonBottomMargin);
   }
@@ -1089,12 +1265,10 @@ class _CmControlPanel extends StatelessWidget {
             windowManager.minimize();
           },
               text: 'Accept and Elevate',
-              icon: Icon(
+              icon: const Icon(
                 Icons.security_rounded,
-                color: Colors.white,
                 size: 14,
               ),
-              textColor: Colors.white,
               tooltip: 'accept_and_elevate_btn_tooltip'),
         ),
         Row(
@@ -1112,7 +1286,6 @@ class _CmControlPanel extends StatelessWidget {
                         windowManager.minimize();
                       },
                       text: 'Accept',
-                      textColor: Colors.white,
                     ),
                   ],
                 ),
@@ -1124,7 +1297,6 @@ class _CmControlPanel extends StatelessWidget {
                 border: Border.all(color: Colors.grey),
                 onClick: handleDisconnect,
                 text: 'Cancel',
-                textColor: null,
               ),
             ),
           ],
@@ -1133,65 +1305,95 @@ class _CmControlPanel extends StatelessWidget {
     ).marginOnly(bottom: buttonBottomMargin);
   }
 
-  Widget buildButton(BuildContext context,
-      {required Color? color,
-      GestureTapCallback? onClick,
-      Widget? icon,
-      BoxBorder? border,
-      required String text,
-      required Color? textColor,
-      String? tooltip,
-      GestureTapDownCallback? onTapDown}) {
+  Widget buildButton(
+    BuildContext context, {
+    Color? color,
+    GestureTapCallback? onClick,
+    Widget? icon,
+    BoxBorder? border,
+    required String text,
+    Color? textColor,
+    String? tooltip,
+    GestureTapDownCallback? onTapDown,
+    bool danger = false,
+  }) {
     assert(!(onClick == null && onTapDown == null));
-    Widget textWidget;
-    if (icon != null) {
-      textWidget = Text(
-        translate(text),
-        style: TextStyle(color: textColor),
-        textAlign: TextAlign.center,
-      );
+
+    final isDanger = danger ||
+        text == 'Disconnect' ||
+        color == Colors.red ||
+        color == Colors.redAccent;
+    final isCancel = text == 'Cancel' || color == Colors.transparent;
+    final isAccept = text == 'Accept' ||
+        color == MyTheme.accent;
+    final isAcceptAndElevate = text == 'Accept and Elevate' ||
+        color == Colors.green ||
+        color == Colors.green[700];
+
+    final Color effectiveBorder;
+    final Color effectiveBg;
+    final Color effectiveText;
+
+    if (isDanger) {
+      effectiveBorder = const Color(0xFFFF3B5C);
+      effectiveBg = const Color(0x14FF3B5C);
+      effectiveText = const Color(0xFFFF3B5C);
+    } else if (isCancel) {
+      effectiveBorder = const Color(0xFF12303A);
+      effectiveBg = Colors.transparent;
+      effectiveText = const Color(0xFF5C7A86);
+    } else if (isAcceptAndElevate) {
+      effectiveBorder = const Color(0xFF00FF9F);
+      effectiveBg = const Color(0x1400FF9F);
+      effectiveText = const Color(0xFF00FF9F);
+    } else if (isAccept) {
+      effectiveBorder = const Color(0xFF00E5FF);
+      effectiveBg = const Color(0x1F00E5FF);
+      effectiveText = const Color(0xFF00E5FF);
     } else {
-      textWidget = Expanded(
-        child: Text(
-          translate(text),
-          style: TextStyle(color: textColor),
-          textAlign: TextAlign.center,
-        ),
-      );
+      effectiveBorder = color ?? const Color(0xFF00E5FF);
+      effectiveBg = (color ?? const Color(0xFF00E5FF)).withOpacity(0.12);
+      effectiveText = textColor ?? const Color(0xFFCFF8FF);
     }
-    final borderRadius = BorderRadius.circular(10.0);
-    final btn = Container(
-      height: 28,
-      decoration: BoxDecoration(
-          color: color, borderRadius: borderRadius, border: border),
-      child: InkWell(
-        borderRadius: borderRadius,
-        onTap: () {
-          if (onClick == null) return;
-          checkClickTime(client.id, onClick);
-        },
-        onTapDown: (details) {
-          if (onTapDown == null) return;
-          checkClickTime(client.id, () {
-            onTapDown.call(details);
-          });
-        },
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Offstage(offstage: icon == null, child: icon).marginOnly(right: 5),
-            textWidget,
-          ],
-        ),
-      ),
-    );
-    return (tooltip != null
-            ? Tooltip(
-                message: translate(tooltip),
-                child: btn,
+
+    final displayText = text == 'Disconnect'
+        ? 'TERMINATE LINK'
+        : translate(text).toUpperCase();
+
+    final effectiveIcon = text == 'Disconnect'
+        ? const Icon(
+            Icons.power_settings_new,
+            size: 15.0,
+            color: Color(0xFFFF3B5C),
+          )
+        : (icon != null
+            ? IconTheme(
+                data: IconThemeData(
+                  color: effectiveText,
+                  size: 14.0,
+                ),
+                child: icon,
               )
-            : btn)
-        .marginAll(4);
+            : null);
+
+    return CyberCutButton(
+      text: displayText,
+      icon: effectiveIcon,
+      color: effectiveBg,
+      borderColor: effectiveBorder,
+      textColor: effectiveText,
+      letterSpacing: text == 'Disconnect' ? 3.0 : 2.0,
+      fontSize: text == 'Disconnect' ? 12.0 : 11.0,
+      height: text == 'Disconnect' ? 40.0 : 34.0,
+      width: double.infinity,
+      tooltip: tooltip != null ? translate(tooltip) : null,
+      onTap: onClick != null
+          ? () => checkClickTime(client.id, onClick)
+          : null,
+      onTapDown: onTapDown != null
+          ? (details) => checkClickTime(client.id, () => onTapDown(details))
+          : null,
+    ).marginAll(3.0);
   }
 
   void handleDisconnect() {

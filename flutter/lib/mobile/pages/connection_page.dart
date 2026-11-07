@@ -4,6 +4,7 @@ import 'package:auto_size_text_field/auto_size_text_field.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hbb/common/formatter/id_formatter.dart';
 import 'package:flutter_hbb/common/widgets/connection_page_title.dart';
+import 'package:flutter_hbb/common/widgets/cyber_widgets.dart';
 import 'package:flutter_hbb/models/state_model.dart';
 import 'package:get/get.dart';
 import 'package:provider/provider.dart';
@@ -86,6 +87,18 @@ class _ConnectionPageState extends State<ConnectionPage> {
             delegate: SliverChildListDelegate([
           if (!bind.isCustomClient() && !isIOS)
             Obx(() => _buildUpdateUI(stateGlobal.updateUrl.value)),
+          const SizedBox(height: 16),
+          Center(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: const [
+                CyberRadar(size: 130),
+                SizedBox(height: 8),
+                CyberLabel('SCANNING_', color: Color(0xFF00E5FF)),
+              ],
+            ),
+          ),
+          const SizedBox(height: 16),
           _buildRemoteIDTextField(),
         ])),
         SliverFillRemaining(
@@ -152,11 +165,7 @@ class _ConnectionPageState extends State<ConnectionPage> {
       height: 84,
       child: Padding(
         padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 2),
-        child: Ink(
-          decoration: BoxDecoration(
-            color: Theme.of(context).cardColor,
-            borderRadius: BorderRadius.all(Radius.circular(13)),
-          ),
+        child: CyberFrame(
           child: Row(
             children: <Widget>[
               Expanded(
@@ -332,14 +341,14 @@ class _ConnectionPageState extends State<ConnectionPage> {
                             _idController.clear();
                           });
                         },
-                        icon: Icon(Icons.clear, color: MyTheme.darkGray)),
+                        icon: const Icon(Icons.clear_outlined, color: MyTheme.darkGray)),
                   )),
               SizedBox(
                 width: 60,
                 height: 60,
                 child: IconButton(
-                  icon: const Icon(Icons.arrow_forward,
-                      color: MyTheme.darkGray, size: 45),
+                  icon: const Icon(Icons.arrow_forward_sharp,
+                      color: Color(0xFF00E5FF), size: 40),
                   onPressed: onConnect,
                 ),
               ),

@@ -8,6 +8,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_hbb/common.dart';
 import 'package:flutter_hbb/common/widgets/animated_rotation_widget.dart';
 import 'package:flutter_hbb/common/widgets/custom_password.dart';
+import 'package:flutter_hbb/common/widgets/cyber_widgets.dart';
 import 'package:flutter_hbb/consts.dart';
 import 'package:flutter_hbb/desktop/pages/connection_page.dart';
 import 'package:flutter_hbb/desktop/pages/desktop_setting_page.dart';
@@ -59,15 +60,25 @@ class _DesktopHomePageState extends State<DesktopHomePage>
   Widget build(BuildContext context) {
     super.build(context);
     final isIncomingOnly = bind.isIncomingOnly();
-    return _buildBlock(
-        child: Row(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        buildLeftPane(context),
-        if (!isIncomingOnly) const VerticalDivider(width: 1),
-        if (!isIncomingOnly) Expanded(child: buildRightPane(context)),
-      ],
-    ));
+    return CyberGridBackground(
+      child: Stack(
+        children: [
+          _buildBlock(
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                buildLeftPane(context),
+                if (!isIncomingOnly) const VerticalDivider(width: 1),
+                if (!isIncomingOnly) Expanded(child: buildRightPane(context)),
+              ],
+            ),
+          ),
+          const Positioned.fill(
+            child: CyberScanLine(),
+          ),
+        ],
+      ),
+    );
   }
 
   Widget _buildBlock({required Widget child}) {
@@ -92,6 +103,7 @@ class _DesktopHomePageState extends State<DesktopHomePage>
       buildTip(context),
       if (!isOutgoingOnly) buildIDBoard(context),
       if (!isOutgoingOnly) buildPasswordBoard(context),
+      if (!isOutgoingOnly) buildStatusBoard(context),
       FutureBuilder<Widget>(
         future: Future.value(
             Obx(() => buildHelpCards(stateGlobal.updateUrl.value))),
@@ -154,7 +166,7 @@ class _DesktopHomePageState extends State<DesktopHomePage>
                   child: InkWell(
                     child: Obx(
                       () => Icon(
-                        Icons.settings,
+                        Icons.settings_outlined,
                         color: _editHover.value
                             ? textColor
                             : Colors.grey.withOpacity(0.5),
@@ -210,16 +222,7 @@ class _DesktopHomePageState extends State<DesktopHomePage>
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text(
-                          translate("ID"),
-                          style: TextStyle(
-                              fontSize: 14,
-                              color: Theme.of(context)
-                                  .textTheme
-                                  .titleLarge
-                                  ?.color
-                                  ?.withOpacity(0.5)),
-                        ).marginOnly(top: 5),
+                        const CyberLabel("NODE ID").marginOnly(top: 5),
                         buildPopupMenu(context)
                       ],
                     ),
@@ -311,12 +314,7 @@ class _DesktopHomePageState extends State<DesktopHomePage>
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  AutoSizeText(
-                    translate("One-time Password"),
-                    style: TextStyle(
-                        fontSize: 14, color: textColor?.withOpacity(0.5)),
-                    maxLines: 1,
-                  ),
+                  const CyberLabel("ACCESS KEY"),
                   Row(
                     children: [
                       Expanded(
@@ -348,7 +346,7 @@ class _DesktopHomePageState extends State<DesktopHomePage>
                             child: Obx(() => RotatedBox(
                                 quarterTurns: 2,
                                 child: Icon(
-                                  Icons.refresh,
+                                  Icons.refresh_outlined,
                                   color: refreshHover.value
                                       ? textColor
                                       : Color(0xFFDDDDDD),
@@ -363,7 +361,7 @@ class _DesktopHomePageState extends State<DesktopHomePage>
                             message: translate('Change Password'),
                             child: Obx(
                               () => Icon(
-                                Icons.edit,
+                                Icons.edit_outlined,
                                 color: editHover.value
                                     ? textColor
                                     : Color(0xFFDDDDDD),
@@ -379,6 +377,108 @@ class _DesktopHomePageState extends State<DesktopHomePage>
                   ),
                 ],
               ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget buildStatusBoard(BuildContext context) {
+    return Container(
+      margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
+      child: Column(
+        children: [
+          Obx(() {
+            final isOnline = stateGlobal.svcStatus.value == SvcStatus.ready;
+            final isConnecting =
+                stateGlobal.svcStatus.value == SvcStatus.connecting;
+            final color = isOnline
+                ? const Color(0xFF00FF9F)
+                : (isConnecting
+                    ? const Color(0xFFFFB020)
+                    : const Color(0xFFFF3B5C));
+            final text = isOnline
+                ? '● ONLINE'
+                : (isConnecting ? '● CONNECTING' : '● OFFLINE');
+            return Container(
+              padding: const EdgeInsets.symmetric(vertical: 6),
+              decoration: const BoxDecoration(
+                border: Border(
+                  bottom: BorderSide(
+                    color: Color(0xFF12303A),
+                    width: 1,
+                  ),
+                ),
+              ),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  const CyberLabel('STATUS'),
+                  Text(
+                    text,
+                    style: TextStyle(
+                      color: color,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 11,
+                      fontFamily: MyTheme.monoFontFamily,
+                      fontFamilyFallback: MyTheme.monoFontFamilyFallback,
+                    ),
+                  ),
+                ],
+              ),
+            );
+          }),
+          Container(
+            padding: const EdgeInsets.symmetric(vertical: 6),
+            decoration: const BoxDecoration(
+              border: Border(
+                bottom: BorderSide(
+                  color: Color(0xFF12303A),
+                  width: 1,
+                ),
+              ),
+            ),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                const CyberLabel('TUNNEL'),
+                Text(
+                  'DIRECT',
+                  style: TextStyle(
+                    color: const Color(0xFF00E5FF),
+                    fontSize: 11,
+                    fontFamily: MyTheme.monoFontFamily,
+                    fontFamilyFallback: MyTheme.monoFontFamilyFallback,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          Container(
+            padding: const EdgeInsets.symmetric(vertical: 6),
+            decoration: const BoxDecoration(
+              border: Border(
+                bottom: BorderSide(
+                  color: Color(0xFF12303A),
+                  width: 1,
+                ),
+              ),
+            ),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                const CyberLabel('CIPHER'),
+                Text(
+                  'E2E',
+                  style: TextStyle(
+                    color: const Color(0xFF00E5FF),
+                    fontSize: 11,
+                    fontFamily: MyTheme.monoFontFamily,
+                    fontFamilyFallback: MyTheme.monoFontFamilyFallback,
+                  ),
+                ),
+              ],
             ),
           ),
         ],
@@ -685,7 +785,7 @@ class _DesktopHomePageState extends State<DesktopHomePage>
             right: 0,
             child: IconButton(
               icon: Icon(
-                Icons.close,
+                Icons.close_outlined,
                 color: Colors.white,
                 size: 20,
               ),

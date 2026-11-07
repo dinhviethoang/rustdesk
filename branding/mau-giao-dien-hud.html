@@ -1,0 +1,115 @@
+<!doctype html>
+<html lang="vi"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>KinG-Control HUD v2</title>
+<style>
+:root{--bg:#04070b;--panel:#070d14;--line:#12303a;--c:#00E5FF;--c2:rgba(0,229,255,.55);--c3:rgba(0,229,255,.12);--g:#00FF9F;--t:#CFF8FF;--m:#5C7A86;--r:#FF3B5C}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--t);font-family:Consolas,'Cascadia Mono','Courier New',monospace;padding:24px 16px;
+background-image:linear-gradient(var(--c3) 1px,transparent 1px),linear-gradient(90deg,var(--c3) 1px,transparent 1px);background-size:24px 24px}
+.lbl{font-size:10px;letter-spacing:2.5px;color:var(--m);text-transform:uppercase}
+.row{display:flex;gap:20px;flex-wrap:wrap;align-items:flex-start;justify-content:center}
+.frame{position:relative;background:var(--panel);border:1px solid var(--line)}
+.frame::before,.frame::after,.frame>.cb::before,.frame>.cb::after{content:"";position:absolute;width:12px;height:12px;border-color:var(--c);border-style:solid}
+.frame::before{top:-1px;left:-1px;border-width:2px 0 0 2px}.frame::after{top:-1px;right:-1px;border-width:2px 2px 0 0}
+.frame>.cb::before{bottom:-1px;left:-1px;border-width:0 0 2px 2px}.frame>.cb::after{bottom:-1px;right:-1px;border-width:0 2px 2px 0}
+.cut{clip-path:polygon(10px 0,100% 0,100% calc(100% - 10px),calc(100% - 10px) 100%,0 100%,0 10px)}
+@keyframes sw{to{transform:rotate(360deg)}}@keyframes bl{50%{opacity:.2}}@keyframes sc{0%{top:0}100%{top:100%}}@keyframes rs{to{transform:rotate(-360deg)}}
+.d{animation:bl 1.4s infinite}
+.radar{position:relative;border-radius:50%}
+.radar .ring{position:absolute;border-radius:50%;border:1px solid var(--line)}
+.radar .ticks{position:absolute;inset:0;border-radius:50%;background:repeating-conic-gradient(var(--c2) 0 .6deg,transparent .6deg 10deg);-webkit-mask:radial-gradient(circle,transparent 66%,#000 67%,#000 70%,transparent 71%);mask:radial-gradient(circle,transparent 66%,#000 67%,#000 70%,transparent 71%)}
+.radar .dash{position:absolute;inset:4px;border-radius:50%;border:1px dashed var(--c2);animation:rs 30s linear infinite}
+.radar .sweep{position:absolute;inset:8%;border-radius:50%;background:conic-gradient(from 0deg,rgba(0,229,255,.5),transparent 60deg);animation:sw 3s linear infinite}
+.radar .x{position:absolute;background:var(--line)}
+.blip{position:absolute;width:6px;height:6px;border-radius:50%;background:var(--g);box-shadow:0 0 8px var(--g)}
+.inp{border:1px solid var(--c2);background:#03080d;padding:11px 12px;font-size:16px;letter-spacing:1px}
+.btn{background:var(--c);color:#02060a;font-weight:700;letter-spacing:3px;font-size:12px;padding:12px 18px;text-align:center;box-shadow:0 0 18px rgba(0,229,255,.35)}
+.kv{display:flex;justify-content:space-between;font-size:12px;padding:7px 0;border-bottom:1px dashed var(--line)}
+.kv b{font-weight:400;color:var(--c)}
+.scan{position:absolute;left:0;right:0;height:1px;background:var(--c2);box-shadow:0 0 10px var(--c);animation:sc 5s linear infinite;pointer-events:none;opacity:.6}
+.ico{width:30px;height:30px;display:inline-flex;align-items:center;justify-content:center;border:1px solid var(--line);color:var(--c)}
+.ico svg{width:15px;height:15px;stroke:currentColor;fill:none;stroke-width:1.6}
+</style></head><body>
+<svg width="0" height="0" style="position:absolute"><defs>
+<symbol id="i-term" viewBox="0 0 24 24"><path d="M4 6l6 6-6 6M12 18h8"/></symbol>
+<symbol id="i-chip" viewBox="0 0 24 24"><rect x="7" y="7" width="10" height="10"/><path d="M10 3v4M14 3v4M10 17v4M14 17v4M3 10h4M3 14h4M17 10h4M17 14h4"/></symbol>
+<symbol id="i-lock" viewBox="0 0 24 24"><path d="M12 3l8 3v6c0 5-3.5 8-8 9-4.5-1-8-4-8-9V6z"/><path d="M9 12l2 2 4-4"/></symbol>
+<symbol id="i-file" viewBox="0 0 24 24"><path d="M4 4h10l6 6v10H4z"/><path d="M14 4v6h6"/></symbol>
+<symbol id="i-power" viewBox="0 0 24 24"><path d="M12 3v8"/><path d="M6.5 7a8 8 0 1 0 11 0"/></symbol>
+<symbol id="i-gear" viewBox="0 0 24 24"><path d="M12 2l2.5 2.5H18v3.5L20.5 12 18 16v3.5h-3.5L12 22l-2.5-2.5H6V16L3.5 12 6 8V4.5h3.5z"/><circle cx="12" cy="12" r="3"/></symbol>
+</defs></svg>
+
+<div class="row">
+<!-- DESKTOP -->
+<div class="frame" style="flex:1 1 640px;max-width:760px;min-width:0;overflow:hidden"><span class="cb"></span>
+<div class="scan"></div>
+<div style="display:flex;align-items:center;gap:10px;padding:10px 16px;border-bottom:1px solid var(--line)">
+<span style="width:8px;height:8px;background:var(--c);box-shadow:0 0 8px var(--c)"></span>
+<span style="letter-spacing:4px;font-size:13px;color:var(--c)">KING-CONTROL</span>
+<span class="lbl" style="margin-left:6px">SYS.v1.5.1</span>
+<span class="lbl" style="margin-left:auto">— ▢ ✕</span></div>
+
+<div style="display:grid;grid-template-columns:230px 1fr;min-height:380px">
+<div style="border-right:1px solid var(--line);padding:18px 16px">
+<div class="lbl">Node ID</div>
+<div style="font-size:22px;color:var(--c);margin:4px 0 16px;letter-spacing:1px">100.116.56.97</div>
+<div class="lbl">Access key</div>
+<div style="display:flex;justify-content:space-between;align-items:center;margin:6px 0 18px;font-size:15px;border-bottom:1px solid var(--c2);padding-bottom:6px">●●●●●●●● <svg style="width:14px;height:14px;stroke:var(--c);fill:none;stroke-width:1.6" viewBox="0 0 24 24"><path d="M4 20h4L19 9l-4-4L4 16z"/></svg></div>
+<div class="kv"><span class="lbl">Status</span><b style="color:var(--g)">● ONLINE</b></div>
+<div class="kv"><span class="lbl">Tunnel</span><b>TAILSCALE</b></div>
+<div class="kv"><span class="lbl">Port</span><b>21118</b></div>
+<div class="kv"><span class="lbl">Cipher</span><b>E2E</b></div>
+</div>
+
+<div style="padding:18px 22px;display:grid;grid-template-columns:1fr 170px;gap:22px;align-items:start">
+<div>
+<div class="lbl">Target node</div>
+<div class="inp cut" style="margin:8px 0 12px">100.88.12.4<span class="d" style="color:var(--c)">▌</span></div>
+<div class="btn cut">CONNECT</div>
+<div class="lbl" style="margin:22px 0 8px">Recent nodes</div>
+<div style="display:flex;flex-direction:column;gap:6px">
+<div style="display:flex;align-items:center;gap:10px;border:1px solid var(--line);padding:8px 10px;font-size:13px"><span style="width:6px;height:6px;background:var(--g)"></span>HOST<span class="lbl" style="margin-left:auto">100.116.56.97</span></div>
+<div style="display:flex;align-items:center;gap:10px;border:1px solid var(--line);padding:8px 10px;font-size:13px"><span style="width:6px;height:6px;background:var(--m)"></span>LAPTOP<span class="lbl" style="margin-left:auto">100.88.12.4</span></div></div>
+</div>
+<div style="text-align:center">
+<div class="radar" style="width:170px;height:170px"><span class="ticks"></span><span class="dash"></span>
+<span class="ring" style="inset:22%"></span><span class="ring" style="inset:38%"></span>
+<span class="x" style="left:50%;top:8%;bottom:8%;width:1px"></span><span class="x" style="top:50%;left:8%;right:8%;height:1px"></span>
+<span class="sweep"></span><span class="blip d" style="left:46px;top:52px"></span><span class="blip d" style="left:112px;top:104px;animation-delay:.6s"></span></div>
+<div class="lbl" style="margin-top:10px;color:var(--c)">Scanning<span class="d">_</span></div>
+<div class="lbl" style="margin-top:2px">2 nodes found</div></div>
+</div></div>
+
+<div style="display:flex;align-items:center;gap:14px;border-top:1px solid var(--line);padding:9px 16px;flex-wrap:wrap">
+<div id="bars" style="display:flex;align-items:flex-end;gap:3px;height:16px"></div>
+<span id="ping" style="font-size:13px;letter-spacing:1px">PING --</span>
+<span class="lbl">FPS 60</span><span class="lbl">1080P</span><span class="lbl">H.265</span>
+<span style="margin-left:auto;display:flex;gap:6px">
+<span class="ico"><svg><use href="#i-term"/></svg></span><span class="ico"><svg><use href="#i-file"/></svg></span><span class="ico"><svg><use href="#i-chip"/></svg></span><span class="ico"><svg><use href="#i-lock"/></svg></span><span class="ico" style="color:var(--r);border-color:rgba(255,59,92,.4)"><svg><use href="#i-power"/></svg></span></span></div>
+</div>
+
+<!-- PHONE -->
+<div style="width:230px;flex-shrink:0;border:1px solid var(--line);border-radius:26px;padding:8px;background:#020407">
+<div class="frame" style="border-radius:18px;padding:16px 14px;min-height:460px"><span class="cb"></span>
+<div style="display:flex;align-items:center;gap:8px"><span style="width:7px;height:7px;background:var(--c);box-shadow:0 0 8px var(--c)"></span><span style="letter-spacing:3px;font-size:11px;color:var(--c)">KING-CONTROL</span><span class="lbl" style="margin-left:auto;color:var(--g)">● ON</span></div>
+<div class="radar" style="width:140px;height:140px;margin:20px auto 8px"><span class="ticks"></span><span class="dash"></span>
+<span class="ring" style="inset:22%"></span><span class="ring" style="inset:38%"></span>
+<span class="x" style="left:50%;top:8%;bottom:8%;width:1px"></span><span class="x" style="top:50%;left:8%;right:8%;height:1px"></span>
+<span class="sweep"></span><span class="blip d" style="left:40px;top:44px"></span></div>
+<div class="lbl" style="text-align:center;color:var(--c)">Scanning<span class="d">_</span></div>
+<div class="lbl" style="margin-top:20px">Target node</div>
+<div class="inp cut" style="margin:6px 0 10px;font-size:14px">100.116.56.97<span class="d" style="color:var(--c)">▌</span></div>
+<div class="btn cut">CONNECT</div>
+<div style="display:flex;justify-content:space-around;margin-top:22px;padding-top:12px;border-top:1px solid var(--line)">
+<span class="ico" style="color:var(--c);border-color:var(--c2)"><svg><use href="#i-term"/></svg></span><span class="ico" style="color:var(--m)"><svg><use href="#i-file"/></svg></span><span class="ico" style="color:var(--m)"><svg><use href="#i-gear"/></svg></span></div>
+</div></div>
+</div>
+
+<script>
+const b=document.getElementById('bars'),p=document.getElementById('ping');
+for(let i=0;i<5;i++){const s=document.createElement('span');s.style.cssText='width:4px;transition:background .3s;height:'+(4+i*3)+'px;background:#12303a';b.appendChild(s)}
+const seq=[23,31,18,95,140,260,45,27];let k=0;
+function t(){const ms=seq[k++%seq.length];const lv=ms<40?5:ms<80?4:ms<150?3:ms<250?2:1;const c=lv>=4?'#00E5FF':lv==3?'#FFB020':'#FF3B5C';
+[...b.children].forEach((s,i)=>s.style.background=i<lv?c:'#12303a');p.textContent='PING '+String(ms).padStart(3,'0')+'ms';p.style.color=c}
+t();setInterval(t,1400);
+</script></body></html>

@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_hbb/common/shared_state.dart';
+import 'package:flutter_hbb/common/widgets/cyber_widgets.dart';
 import 'package:flutter_hbb/common/widgets/toolbar.dart';
 import 'package:flutter_hbb/consts.dart';
 import 'package:flutter_hbb/mobile/widgets/floating_mouse.dart';
@@ -510,8 +511,8 @@ class _RemotePageState extends State<RemotePage> with WidgetsBindingObserver {
                   mini: !keyboardIsVisible,
                   child: Icon(
                     (keyboardIsVisible || _showGestureHelp)
-                        ? Icons.expand_more
-                        : Icons.expand_less,
+                        ? Icons.expand_more_outlined
+                        : Icons.expand_less_outlined,
                     color: Colors.white,
                   ),
                   backgroundColor: MyTheme.accent,
@@ -605,98 +606,143 @@ class _RemotePageState extends State<RemotePage> with WidgetsBindingObserver {
   Widget getBottomAppBar() {
     final ffiModel = Provider.of<FfiModel>(context);
     return BottomAppBar(
-      elevation: 10,
-      color: MyTheme.accent,
-      child: Row(
-        mainAxisSize: MainAxisSize.max,
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: <Widget>[
-          Row(
+      elevation: 0,
+      color: const Color(0xFF070D14),
+      child: Container(
+        decoration: const BoxDecoration(
+          color: Color(0xFF070D14),
+          border: Border(top: BorderSide(color: Color(0xFF12303A), width: 1)),
+        ),
+        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+        child: Row(
+          mainAxisSize: MainAxisSize.max,
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: <Widget>[
+            Row(
               children: <Widget>[
-                    IconButton(
-                      color: Colors.white,
-                      icon: Icon(Icons.clear),
-                      onPressed: () {
-                        clientClose(sessionId, gFFI);
-                      },
-                    ),
-                    IconButton(
-                      color: Colors.white,
-                      icon: Icon(Icons.tv),
-                      onPressed: () {
-                        setState(() => _showEdit = false);
-                        showOptions(context, widget.id, gFFI.dialogManager);
-                      },
-                    )
-                  ] +
-                  (isWebDesktop || ffiModel.viewOnly || !ffiModel.keyboard
-                      ? []
-                      : gFFI.ffiModel.isPeerAndroid
-                          ? [
-                              IconButton(
-                                  color: Colors.white,
-                                  icon: Icon(Icons.keyboard),
-                                  onPressed: openKeyboard),
-                              IconButton(
-                                color: Colors.white,
-                                icon: const Icon(Icons.build),
-                                onPressed: () => gFFI.dialogManager
-                                    .toggleMobileActionsOverlay(ffi: gFFI),
-                              )
-                            ]
-                          : [
-                              IconButton(
-                                  color: Colors.white,
-                                  icon: Icon(Icons.keyboard),
-                                  onPressed: openKeyboard),
-                              IconButton(
-                                color: Colors.white,
-                                icon: Icon(gFFI.ffiModel.touchMode
-                                    ? Icons.touch_app
-                                    : Icons.mouse),
-                                onPressed: () => setState(
-                                    () => _showGestureHelp = !_showGestureHelp),
-                              ),
-                            ]) +
-                  (isWeb
-                      ? []
-                      : <Widget>[
-                          futureBuilder(
-                              future: gFFI.invokeMethod(
-                                  "get_value", "KEY_IS_SUPPORT_VOICE_CALL"),
-                              hasData: (isSupportVoiceCall) => IconButton(
-                                    color: Colors.white,
-                                    icon: isAndroid && isSupportVoiceCall
-                                        ? SvgPicture.asset('assets/chat.svg',
-                                            colorFilter: ColorFilter.mode(
-                                                Colors.white, BlendMode.srcIn))
-                                        : Icon(Icons.message),
-                                    onPressed: () =>
-                                        isAndroid && isSupportVoiceCall
-                                            ? showChatOptions(widget.id)
-                                            : onPressedTextChat(widget.id),
-                                  ))
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 3),
+                  child: CyberIcon(
+                    icon: Icons.close_outlined,
+                    danger: true,
+                    tooltip: translate('Close'),
+                    onTap: () {
+                      clientClose(sessionId, gFFI);
+                    },
+                  ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 3),
+                  child: CyberIcon(
+                    icon: Icons.connected_tv,
+                    tooltip: translate('Display'),
+                    onTap: () {
+                      setState(() => _showEdit = false);
+                      showOptions(context, widget.id, gFFI.dialogManager);
+                    },
+                  ),
+                ),
+              ] +
+              (isWebDesktop || ffiModel.viewOnly || !ffiModel.keyboard
+                  ? []
+                  : gFFI.ffiModel.isPeerAndroid
+                      ? [
+                          Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 3),
+                            child: CyberIcon(
+                              icon: Icons.keyboard_outlined,
+                              onTap: openKeyboard,
+                            ),
+                          ),
+                          Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 3),
+                            child: CyberIcon(
+                              icon: Icons.build_outlined,
+                              onTap: () => gFFI.dialogManager
+                                  .toggleMobileActionsOverlay(ffi: gFFI),
+                            ),
+                          ),
+                        ]
+                      : [
+                          Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 3),
+                            child: CyberIcon(
+                              icon: Icons.keyboard_outlined,
+                              onTap: openKeyboard,
+                            ),
+                          ),
+                          Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 3),
+                            child: CyberIcon(
+                              icon: gFFI.ffiModel.touchMode
+                                  ? Icons.touch_app_outlined
+                                  : Icons.mouse_outlined,
+                              onTap: () => setState(
+                                  () => _showGestureHelp = !_showGestureHelp),
+                            ),
+                          ),
                         ]) +
-                  [
-                    IconButton(
-                      color: Colors.white,
-                      icon: Icon(Icons.more_vert),
-                      onPressed: () {
-                        setState(() => _showEdit = false);
-                        showActions(widget.id);
-                      },
-                    ),
-                  ]),
-          Obx(() => IconButton(
-                color: Colors.white,
-                icon: Icon(Icons.expand_more),
-                onPressed: gFFI.ffiModel.waitForFirstImage.isTrue
-                    ? null
-                    : () {
-                        setState(() => _showBar = !_showBar);
-                      },
-              )),
-        ],
+              (isWeb
+                  ? []
+                  : <Widget>[
+                      futureBuilder(
+                          future: gFFI.invokeMethod(
+                              "get_value", "KEY_IS_SUPPORT_VOICE_CALL"),
+                          hasData: (isSupportVoiceCall) => Padding(
+                                padding: const EdgeInsets.symmetric(horizontal: 3),
+                                child: CyberIcon(
+                                  icon: Icons.message_outlined,
+                                  onTap: () =>
+                                      isAndroid && isSupportVoiceCall
+                                          ? showChatOptions(widget.id)
+                                          : onPressedTextChat(widget.id),
+                                ),
+                              ))
+                    ]) +
+              [
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 3),
+                  child: CyberIcon(
+                    icon: Icons.more_vert_outlined,
+                    onTap: () {
+                      setState(() => _showEdit = false);
+                      showActions(widget.id);
+                    },
+                  ),
+                ),
+              ],
+            ),
+            Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                AnimatedBuilder(
+                  animation: gFFI.qualityMonitorModel,
+                  builder: (context, _) {
+                    final delayStr = gFFI.qualityMonitorModel.data.delay;
+                    final ms = parseDelay(delayStr);
+                    return Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        CyberSignalBars(level: levelFromPing(ms)),
+                        const SizedBox(width: 4),
+                        CyberPing(ms: ms, fontSize: 11),
+                      ],
+                    );
+                  },
+                ),
+                const SizedBox(width: 6),
+                Obx(() => CyberIcon(
+                      icon: Icons.expand_more_outlined,
+                      onTap: gFFI.ffiModel.waitForFirstImage.isTrue
+                          ? null
+                          : () {
+                              setState(() => _showBar = !_showBar);
+                            },
+                    )),
+              ],
+            ),
+          ],
+        ),
       ),
     );
   }

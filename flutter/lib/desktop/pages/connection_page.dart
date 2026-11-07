@@ -6,6 +6,7 @@ import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_hbb/common/widgets/connection_page_title.dart';
+import 'package:flutter_hbb/common/widgets/cyber_widgets.dart';
 import 'package:flutter_hbb/consts.dart';
 import 'package:flutter_hbb/desktop/widgets/popup_menu.dart';
 import 'package:flutter_hbb/models/state_model.dart';
@@ -311,8 +312,21 @@ class _ConnectionPageState extends State<ConnectionPage>
             child: Column(
           children: [
             Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Flexible(child: _buildRemoteIDTextField(context)),
+                const SizedBox(width: 24),
+                Padding(
+                  padding: const EdgeInsets.only(top: 8.0, right: 16.0),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: const [
+                      CyberRadar(size: 160),
+                      SizedBox(height: 10),
+                      CyberLabel('SCANNING_', color: Color(0xFF00E5FF)),
+                    ],
+                  ),
+                ),
               ],
             ).marginOnly(top: 22),
             SizedBox(height: 12),
@@ -376,12 +390,9 @@ class _ConnectionPageState extends State<ConnectionPage>
   /// UI for the remote ID TextField.
   /// Search for a peer.
   Widget _buildRemoteIDTextField(BuildContext context) {
-    var w = Container(
+    var w = CyberFrame(
       width: 320 + 20 * 2,
       padding: const EdgeInsets.fromLTRB(20, 24, 20, 22),
-      decoration: BoxDecoration(
-          borderRadius: const BorderRadius.all(Radius.circular(13)),
-          border: Border.all(color: Theme.of(context).colorScheme.background)),
       child: Ink(
         child: Column(
           children: [
@@ -552,21 +563,35 @@ class _ConnectionPageState extends State<ConnectionPage>
               padding: const EdgeInsets.only(top: 13.0),
               child: Row(mainAxisAlignment: MainAxisAlignment.end, children: [
                 SizedBox(
-                  height: 28.0,
+                  height: 32.0,
                   child: ElevatedButton(
                     onPressed: () {
                       onConnect();
                     },
-                    child: Text(translate("Connect")),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: const Color(0xFF00E5FF),
+                      foregroundColor: const Color(0xFF02060A),
+                      elevation: 0,
+                      shadowColor: const Color(0x5900E5FF),
+                      shape: const BeveledRectangleBorder(
+                        borderRadius: BorderRadius.all(Radius.circular(8.0)),
+                      ),
+                      textStyle: const TextStyle(
+                        fontWeight: FontWeight.bold,
+                        letterSpacing: 3,
+                        fontSize: 12,
+                      ),
+                    ),
+                    child: const Text("CONNECT"),
                   ),
                 ),
                 const SizedBox(width: 8),
                 Container(
-                  height: 28.0,
-                  width: 28.0,
+                  height: 32.0,
+                  width: 32.0,
                   decoration: BoxDecoration(
-                    border: Border.all(color: Theme.of(context).dividerColor),
-                    borderRadius: BorderRadius.circular(8),
+                    color: const Color(0xFF070D14),
+                    border: Border.all(color: const Color(0xFF12303A)),
                   ),
                   child: Center(
                     child: StatefulBuilder(
@@ -576,9 +601,9 @@ class _ConnectionPageState extends State<ConnectionPage>
                               child: _menuOpen.value
                                   ? Transform.rotate(
                                       angle: pi,
-                                      child: Icon(IconFont.more, size: 14),
+                                      child: Icon(IconFont.more, size: 14, color: const Color(0xFF00E5FF)),
                                     )
-                                  : Icon(IconFont.more, size: 14),
+                                  : Icon(IconFont.more, size: 14, color: const Color(0xFF00E5FF)),
                               onTapDown: (e) {
                                 offset = e.globalPosition;
                               },
