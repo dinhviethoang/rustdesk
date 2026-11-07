@@ -1,6 +1,6 @@
-# Hướng Dẫn Cài Đặt & Sử Dụng KinG-Remote (Kết Nối Qua Tailscale)
+# Hướng Dẫn Cài Đặt & Sử Dụng KinG-Control (Kết Nối Qua Tailscale)
 
-KinG-Remote là ứng dụng điều khiển máy tính từ xa (phát triển từ RustDesk). Phiên bản này đã được thiết lập mặc định kết nối trực tiếp qua mạng riêng ảo Tailscale (IP dạng `100.x.x.x`, cổng TCP 21118) và xác thực bằng mật khẩu cố định mà không cần máy chủ trung gian.
+KinG-Control là ứng dụng điều khiển máy tính từ xa (phát triển từ RustDesk). Phiên bản này đã được thiết lập mặc định kết nối trực tiếp qua mạng riêng ảo Tailscale (IP dạng `100.x.x.x`, cổng TCP 21118) và xác thực bằng mật khẩu cố định mà không cần máy chủ trung gian.
 
 ---
 
@@ -9,7 +9,7 @@ KinG-Remote là ứng dụng điều khiển máy tính từ xa (phát triển t
 1. Truy cập repo GitHub: `https://github.com/dinhviethoang/rustdesk`.
 2. Vào thẻ **Actions** > chọn workflow **Flutter Nightly Build** (nhánh `king-remote`) > chọn lần chạy gần nhất để tải trong mục **Artifacts** (hoặc vào mục **Releases** tìm tag `nightly`).
 3. Chọn file tải về phù hợp:
-   - **Windows:** Tải file `.msi` (hoặc `.exe`) có tên dạng `rustdesk-<phiên bản>-x86_64.msi` (tên file là rustdesk, khi mở ứng dụng sẽ hiển thị tên **KinG-Remote**).
+   - **Windows:** Tải file `.msi` (hoặc `.exe`) có tên dạng `rustdesk-<phiên bản>-x86_64.msi` (tên file là rustdesk, khi mở ứng dụng sẽ hiển thị tên **KinG-Control**).
    - **Android:** Tải file cài đặt `.apk` bản `aarch64`.
 
 ---
@@ -20,10 +20,10 @@ KinG-Remote là ứng dụng điều khiển máy tính từ xa (phát triển t
    - Tải và cài đặt Tailscale từ trang chủ (`tailscale.com`).
    - Đăng nhập tài khoản cá nhân (Google, Microsoft,...).
    - Nhấp vào biểu tượng Tailscale ở khay hệ thống và ghi lại địa chỉ IP của máy (dạng `100.x.x.x`).
-2. **Cài đặt KinG-Remote:**
+2. **Cài đặt KinG-Control:**
    - Chạy file `.msi` để cài ứng dụng thành dịch vụ hệ thống (chạy ngầm tự động ngay cả khi chưa đăng nhập Windows).
 3. **Đặt mật khẩu cố định:**
-   - Mở KinG-Remote, vào **Cài đặt** > **Bảo mật** > **Mật khẩu**.
+   - Mở KinG-Control, vào **Cài đặt** > **Bảo mật** > **Mật khẩu**.
    - Đặt mật khẩu cố định để sử dụng khi kết nối từ xa.
 4. **Kiểm tra truy cập IP trực tiếp:**
    - Kiểm tra tùy chọn **Cho phép truy cập IP trực tiếp** (Direct IP Access) đã được bật (mặc định đã bật trên cổng 21118).
@@ -36,7 +36,7 @@ KinG-Remote là ứng dụng điều khiển máy tính từ xa (phát triển t
 ## 3. Điều Khiển Từ Máy Tính Khác
 
 1. Cài đặt **Tailscale** và đăng nhập cùng tài khoản với máy 24/24.
-2. Cài đặt và khởi chạy **KinG-Remote**.
+2. Cài đặt và khởi chạy **KinG-Control**.
 3. Tại ô nhập **ID**, điền địa chỉ IP Tailscale (`100.x.x.x`) của máy 24/24 cần kết nối.
 4. Nhấn kết nối và nhập mật khẩu cố định đã tạo ở Bước 2.
 
@@ -45,8 +45,8 @@ KinG-Remote là ứng dụng điều khiển máy tính từ xa (phát triển t
 ## 4. Điều Khiển Từ Điện Thoại Android
 
 1. Cài đặt **Tailscale** từ CH Play và đăng nhập cùng tài khoản.
-2. Cài file **KinG-Remote .apk** đã tải (bật xác nhận cho phép cài đặt từ nguồn không xác định nếu có cảnh báo).
-3. Mở KinG-Remote, nhập IP Tailscale (`100.x.x.x`) vào ô ID rồi nhấn kết nối và nhập mật khẩu cố định.
+2. Cài file **KinG-Control .apk** đã tải (bật xác nhận cho phép cài đặt từ nguồn không xác định nếu có cảnh báo).
+3. Mở KinG-Control, nhập IP Tailscale (`100.x.x.x`) vào ô ID rồi nhấn kết nối và nhập mật khẩu cố định.
 4. **Mẹo thao tác trên màn hình điện thoại:**
    - Chạm 1 ngón: Nhấp chuột trái.
    - Chạm 2 ngón: Nhấp chuột phải.

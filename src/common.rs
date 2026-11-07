@@ -2493,8 +2493,8 @@ pub fn rustdesk_interval(i: Interval) -> ThrottledInterval {
 }
 
 pub fn load_custom_client() {
-    // KinG-Remote: tên app riêng, đặt ở đây để không phải sửa submodule hbb_common.
-    *config::APP_NAME.write().unwrap() = "KinG-Remote".to_owned();
+    // KinG-Control: tên app riêng, đặt ở đây để không phải sửa submodule hbb_common.
+    *config::APP_NAME.write().unwrap() = "KinG-Control".to_owned();
     // Thiết lập cấu hình mặc định nếu chưa tồn tại
     {
         let mut settings = config::DEFAULT_SETTINGS.write().unwrap();

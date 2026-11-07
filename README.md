@@ -1,15 +1,15 @@
-# KinG-Remote
+# KinG-Control
 
 <p align="center">
-  <img src="res/icon.png" alt="KinG-Remote Logo" width="128" height="128">
+  <img src="res/icon.png" alt="KinG-Control Logo" width="128" height="128">
 </p>
 
-KinG-Remote là phần mềm điều khiển máy tính từ xa cá nhân, tối ưu cho kết nối trực tiếp P2P qua mạng riêng ảo (như Tailscale) mà không cần cấu hình máy chủ trung gian phức tạp.
+KinG-Control là phần mềm điều khiển máy tính từ xa cá nhân, tối ưu cho kết nối trực tiếp P2P qua mạng riêng ảo (như Tailscale) mà không cần cấu hình máy chủ trung gian phức tạp.
 
 ## Tải về
 
 Tải bản cài đặt mới nhất (Windows MSI/EXE & Android APK) tại:
-👉 [KinG-Remote Releases (Nightly)](https://github.com/dinhviethoang/rustdesk/releases/tag/nightly)
+👉 [KinG-Control Releases (Nightly)](https://github.com/dinhviethoang/rustdesk/releases/tag/nightly)
 
 ## Cài đặt & Sử dụng
 
