@@ -3,6 +3,10 @@
 Fork: https://github.com/dinhviethoang/rustdesk (gốc: rustdesk/rustdesk, AGPL-3.0)
 
 ## Đã xong
+- 07/11: Build #6 (run 42332508095, commit c864960) OK cho Windows x64 + Android (APK DA KY: KinG-Control-1.5.1-*-signed.apk). Loi macOS + Windows ARM (khong can). Workflow Nightly da tat lai.
+- 07/11: Doi ten app KinG-Control; giao dien HUD cyber (agy): theme cyan, cyber_widgets.dart (radar, ping, cot song, khung goc), man hinh chinh, thanh cong cu, cua so ket noi. Mau: branding/mau-giao-dien-hud.html, mau-bang-dieu-khien.html.
+- 07/11: Xoa docs/, fastlane/, workflow thua, AGENTS/GEMINI.md; README moi (agy). Sua .github/patches/apply_flutter_3.44_source_patches.sh cho theme moi.
+- 07/11: Khoa ky Android o C:/Users/KiNG_613/Projects/king-control-khoa (NGOAI repo, phai sao luu); 4 secret ANDROID_* da them tren GitHub.
 - 04/11: Đổi tên toàn bộ phần người dùng thấy (commit 8b9f69c, build #4 run 41771477710 OK trừ macOS): file KinG-Remote-1.5.1-*.exe/.msi/.apk, MSI --app-name KinG-Remote (thư mục cài, dịch vụ, gỡ cài đặt), Android applicationId com.king.remote, tiêu đề cửa sổ. Claude tự làm vì agy/codex hết quota cả tuần. Workflow Nightly đã tắt lại. Trên release vẫn còn file rustdesk-* cũ (người dùng tự xoá nếu muốn).
 - 04/11: Build #3 (run 41681411560, commit d006ffd) xong: Windows .exe/.msi + Android .apk mới (icon trong suốt + mặc định) trên release nightly. Chỉ macOS lỗi (không cần). Đã push 861a451.
 - 04/11: HUONG-DAN-CAI-DAT.md (agy Flash High viết, Claude kiểm tra): tải file, máy 24/24, máy tính khác, Android, iPhone, sự cố.
