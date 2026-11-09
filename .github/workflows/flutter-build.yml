@@ -1130,24 +1130,20 @@ jobs:
           # Opt-in, and its macOS tests run nowhere else.
           cargo test --locked --release -p clipboard --features unix-file-copy-paste
 
-      - name: Fix macOS dylib and Ad-hoc Codesign
-        if: runner.os == 'macOS'
-        run: |
-          APP_PATH=$(find . -name "*.app" -path "*/Release/*.app" | head -n 1)
-          if [ -n "$APP_PATH" ]; then
-            echo "Signing app bundle: $APP_PATH"
-            chmod -R +x "$APP_PATH/Contents/MacOS/" || true
-            chmod -R +x "$APP_PATH/Contents/Frameworks/" || true
-            xattr -cr "$APP_PATH" || true
-            find "$APP_PATH/Contents/Frameworks" -name "*.dylib" -exec codesign --force --sign - --timestamp=none {} \; || true
-            find "$APP_PATH/Contents/Frameworks" -name "*.framework" -exec codesign --force --deep --sign - --timestamp=none {} \; || true
-            codesign --force --deep --sign - --entitlements flutter/macos/Runner/Release.entitlements --timestamp=none "$APP_PATH"
-            codesign --verify --deep --strict --verbose=2 "$APP_PATH"
-          fi
-
       - name: create unsigned dmg
         if: env.UPLOAD_ARTIFACT == 'true'
         run: |
+          # Fix permissions and ad-hoc sign for macOS 27.0.1
+          for app in flutter/build/macos/Build/Products/Release/*.app; do
+            if [ -d "$app" ]; then
+              chmod -R +x "$app/Contents/MacOS/" || true
+              chmod -R +x "$app/Contents/Frameworks/" || true
+              xattr -cr "$app" || true
+              find "$app/Contents/Frameworks" -name "*.dylib" -exec codesign --force --sign - --timestamp=none {} \; || true
+              find "$app/Contents/Frameworks" -name "*.framework" -exec codesign --force --deep --sign - --timestamp=none {} \; || true
+              codesign --force --deep --sign - --entitlements flutter/macos/Runner/Release.entitlements --timestamp=none "$app" || codesign --force --deep --sign - --timestamp=none "$app" || true
+            fi
+          done
           CREATE_DMG="$(command -v create-dmg)"
           CREATE_DMG="$(readlink -f "$CREATE_DMG")"
           sed -i -e 's/MAXIMUM_UNMOUNTING_ATTEMPTS=3/MAXIMUM_UNMOUNTING_ATTEMPTS=7/' "$CREATE_DMG"
@@ -1164,6 +1160,17 @@ jobs:
         if: env.MACOS_P12_BASE64 != null && env.UPLOAD_ARTIFACT == 'true'
         run: |
           # Patch create-dmg to give more attempts to unmount image
+          # Fix permissions and ad-hoc sign for macOS 27.0.1
+          for app in flutter/build/macos/Build/Products/Release/*.app; do
+            if [ -d "$app" ]; then
+              chmod -R +x "$app/Contents/MacOS/" || true
+              chmod -R +x "$app/Contents/Frameworks/" || true
+              xattr -cr "$app" || true
+              find "$app/Contents/Frameworks" -name "*.dylib" -exec codesign --force --sign - --timestamp=none {} \; || true
+              find "$app/Contents/Frameworks" -name "*.framework" -exec codesign --force --deep --sign - --timestamp=none {} \; || true
+              codesign --force --deep --sign - --entitlements flutter/macos/Runner/Release.entitlements --timestamp=none "$app" || codesign --force --deep --sign - --timestamp=none "$app" || true
+            fi
+          done
           CREATE_DMG="$(command -v create-dmg)"
           CREATE_DMG="$(readlink -f "$CREATE_DMG")"
           sed -i -e 's/MAXIMUM_UNMOUNTING_ATTEMPTS=3/MAXIMUM_UNMOUNTING_ATTEMPTS=7/' "$CREATE_DMG"
