@@ -190,6 +190,21 @@ jobs:
         run: |
           ./build.py --flutter ${{ matrix.job.extra-build-args }}
 
+      - name: Fix macOS dylib and Ad-hoc Codesign
+        if: runner.os == 'macOS'
+        run: |
+          APP_PATH=$(find . -name "*.app" -path "*/Release/*.app" | head -n 1)
+          if [ -n "$APP_PATH" ]; then
+            echo "Signing app bundle: $APP_PATH"
+            chmod -R +x "$APP_PATH/Contents/MacOS/" || true
+            chmod -R +x "$APP_PATH/Contents/Frameworks/" || true
+            xattr -cr "$APP_PATH" || true
+            find "$APP_PATH/Contents/Frameworks" -name "*.dylib" -exec codesign --force --sign - --timestamp=none {} \; || true
+            find "$APP_PATH/Contents/Frameworks" -name "*.framework" -exec codesign --force --deep --sign - --timestamp=none {} \; || true
+            codesign --force --deep --sign - --entitlements flutter/macos/Runner/Release.entitlements --timestamp=none "$APP_PATH"
+            codesign --verify --deep --strict --verbose=2 "$APP_PATH"
+          fi
+
       - name: create unsigned dmg
         run: |
           CREATE_DMG="$(command -v create-dmg)"
