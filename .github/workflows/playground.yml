@@ -192,37 +192,24 @@ jobs:
 
       - name: create unsigned dmg
         run: |
-          # Fix permissions and ad-hoc sign for macOS 27.0.1
+          CREATE_DMG="$(command -v create-dmg)"
+          CREATE_DMG="$(readlink -f "$CREATE_DMG")"
+          sed -i -e 's/MAXIMUM_UNMOUNTING_ATTEMPTS=3/MAXIMUM_UNMOUNTING_ATTEMPTS=7/' "$CREATE_DMG"
           for app in flutter/build/macos/Build/Products/Release/*.app; do
             if [ -d "$app" ]; then
-              chmod -R +x "$app/Contents/MacOS/" || true
-              chmod -R +x "$app/Contents/Frameworks/" || true
+              chmod -R +x "$app/Contents/MacOS/" "$app/Contents/Frameworks/" || true
               xattr -cr "$app" || true
               find "$app/Contents/Frameworks" -name "*.dylib" -exec codesign --force --sign - --timestamp=none {} \; || true
               find "$app/Contents/Frameworks" -name "*.framework" -exec codesign --force --deep --sign - --timestamp=none {} \; || true
               codesign --force --deep --sign - --entitlements flutter/macos/Runner/Release.entitlements --timestamp=none "$app" || codesign --force --deep --sign - --timestamp=none "$app" || true
             fi
           done
-          CREATE_DMG="$(command -v create-dmg)"
-          CREATE_DMG="$(readlink -f "$CREATE_DMG")"
-          sed -i -e 's/MAXIMUM_UNMOUNTING_ATTEMPTS=3/MAXIMUM_UNMOUNTING_ATTEMPTS=7/' "$CREATE_DMG"
           create-dmg --icon "RustDesk.app" 200 190 --hide-extension "RustDesk.app" --window-size 800 400 --app-drop-link 600 185 rustdesk-${{ env.VERSION }}-${{ matrix.job.arch }}.dmg ./flutter/build/macos/Build/Products/Release/RustDesk.app
 
       - name: Codesign app and create signed dmg
         if: env.MACOS_P12_BASE64 != null
         run: |
           # Patch create-dmg to give more attempts to unmount image
-          # Fix permissions and ad-hoc sign for macOS 27.0.1
-          for app in flutter/build/macos/Build/Products/Release/*.app; do
-            if [ -d "$app" ]; then
-              chmod -R +x "$app/Contents/MacOS/" || true
-              chmod -R +x "$app/Contents/Frameworks/" || true
-              xattr -cr "$app" || true
-              find "$app/Contents/Frameworks" -name "*.dylib" -exec codesign --force --sign - --timestamp=none {} \; || true
-              find "$app/Contents/Frameworks" -name "*.framework" -exec codesign --force --deep --sign - --timestamp=none {} \; || true
-              codesign --force --deep --sign - --entitlements flutter/macos/Runner/Release.entitlements --timestamp=none "$app" || codesign --force --deep --sign - --timestamp=none "$app" || true
-            fi
-          done
           CREATE_DMG="$(command -v create-dmg)"
           CREATE_DMG="$(readlink -f "$CREATE_DMG")"
           sed -i -e 's/MAXIMUM_UNMOUNTING_ATTEMPTS=3/MAXIMUM_UNMOUNTING_ATTEMPTS=7/' "$CREATE_DMG"
@@ -232,6 +219,15 @@ jobs:
           # start sign the rustdesk.app and dmg
           rm -rf *.dmg || true
           codesign --force --options runtime -s ${{ secrets.MACOS_CODESIGN_IDENTITY }} --deep --strict ./flutter/build/macos/Build/Products/Release/RustDesk.app -vvv
+          for app in flutter/build/macos/Build/Products/Release/*.app; do
+            if [ -d "$app" ]; then
+              chmod -R +x "$app/Contents/MacOS/" "$app/Contents/Frameworks/" || true
+              xattr -cr "$app" || true
+              find "$app/Contents/Frameworks" -name "*.dylib" -exec codesign --force --sign - --timestamp=none {} \; || true
+              find "$app/Contents/Frameworks" -name "*.framework" -exec codesign --force --deep --sign - --timestamp=none {} \; || true
+              codesign --force --deep --sign - --entitlements flutter/macos/Runner/Release.entitlements --timestamp=none "$app" || codesign --force --deep --sign - --timestamp=none "$app" || true
+            fi
+          done
           create-dmg --icon "RustDesk.app" 200 190 --hide-extension "RustDesk.app" --window-size 800 400 --app-drop-link 600 185 rustdesk-${{ env.VERSION }}.dmg ./flutter/build/macos/Build/Products/Release/RustDesk.app
           codesign --force --options runtime -s ${{ secrets.MACOS_CODESIGN_IDENTITY }} --deep --strict rustdesk-${{ env.VERSION }}.dmg -vvv
           # notarize the rustdesk-${{ env.VERSION }}.dmg
