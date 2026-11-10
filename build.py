@@ -946,7 +946,21 @@ def build_flutter_dmg(version, features):
     mac_arch = 'arm64' if platform.machine().lower() in ('arm64', 'aarch64') else 'x86_64'
     system2(
         f'FLUTTER_XCODE_ARCHS={mac_arch} FLUTTER_XCODE_ONLY_ACTIVE_ARCH=YES flutter build macos --release')
-    system2('cp -rf ../target/release/service ./build/macos/Build/Products/Release/RustDesk.app/Contents/MacOS/')
+    # The bundle is named after PRODUCT_NAME in AppInfo.xcconfig (e.g. KinG-Control.app), not RustDesk.app.
+    app_name = 'RustDesk'
+    with open('macos/Runner/Configs/AppInfo.xcconfig') as f:
+        for line in f:
+            m = re.match(r'\s*PRODUCT_NAME\s*=\s*(.+?)\s*$', line)
+            if m:
+                app_name = m.group(1)
+                break
+    app_path = f'./build/macos/Build/Products/Release/{app_name}.app'
+    system2(f'cp -rf ../target/release/service "{app_path}/Contents/MacOS/"')
+    # Copying `service` into the bundle breaks Xcode's signature; Apple Silicon refuses to run
+    # unsigned or broken-signed code, so re-seal the bundle ad-hoc. A Developer ID signing step
+    # (if configured) re-signs it later anyway.
+    system2(f'codesign --force --deep --sign - --entitlements macos/Runner/Release.entitlements "{app_path}"')
+    system2(f'codesign --verify --deep --strict "{app_path}"')
     '''
     system2(
         "create-dmg --volname \"RustDesk Installer\" --window-pos 200 120 --window-size 800 400 --icon-size 100 --app-drop-link 600 185 --icon RustDesk.app 200 190 --hide-extension RustDesk.app rustdesk.dmg ./build/macos/Build/Products/Release/RustDesk.app")
