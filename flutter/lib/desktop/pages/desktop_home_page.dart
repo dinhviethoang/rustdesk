@@ -8,6 +8,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_hbb/common.dart';
 import 'package:flutter_hbb/common/widgets/animated_rotation_widget.dart';
 import 'package:flutter_hbb/common/widgets/custom_password.dart';
+import 'package:flutter_hbb/common/widgets/king_widgets.dart';
 import 'package:flutter_hbb/consts.dart';
 import 'package:flutter_hbb/desktop/pages/connection_page.dart';
 import 'package:flutter_hbb/desktop/pages/desktop_setting_page.dart';
@@ -85,9 +86,10 @@ class _DesktopHomePageState extends State<DesktopHomePage>
           alignment: Alignment.center,
           child: loadPowered(context),
         ),
+      const KingHazardStripe(),
       Align(
         alignment: Alignment.center,
-        child: loadLogo(),
+        child: const KingEmblem(size: 120).marginOnly(top: 16, bottom: 4),
       ),
       buildTip(context),
       if (!isOutgoingOnly) buildIDBoard(context),
@@ -240,6 +242,8 @@ class _DesktopHomePageState extends State<DesktopHomePage>
                         ),
                         style: TextStyle(
                           fontSize: 22,
+                          color: MyTheme.accent,
+                          letterSpacing: 1.5,
                         ),
                       ).workaroundFreezeLinuxMint(),
                     ),

@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 import '../../common.dart';
+import 'king_widgets.dart';
 
 Widget getConnectionPageTitle(BuildContext context, bool isWeb) {
   return Row(
@@ -33,6 +34,7 @@ Widget getConnectionPageTitle(BuildContext context, bool isWeb) {
           ),
         ],
       )),
+      const KingGearPair(size: 26),
     ],
   );
 }
