@@ -292,3 +292,127 @@ class _HazardPainter extends CustomPainter {
   @override
   bool shouldRepaint(_HazardPainter old) => old.phase != phase;
 }
+
+/// Full-window startup screen laid over [child]; fades out on its own or on tap.
+class KingSplashOverlay extends StatefulWidget {
+  final Widget child;
+  final String title;
+
+  const KingSplashOverlay({super.key, required this.child, required this.title});
+
+  @override
+  State<KingSplashOverlay> createState() => _KingSplashOverlayState();
+}
+
+class _KingSplashOverlayState extends State<KingSplashOverlay> {
+  static bool _shownOnce = false;
+  static const _hold = Duration(milliseconds: 2400);
+  static const _fade = Duration(milliseconds: 500);
+
+  bool _visible = !_shownOnce;
+  bool _fading = false;
+
+  @override
+  void initState() {
+    super.initState();
+    if (_visible) {
+      _shownOnce = true;
+      Future.delayed(_hold, _dismiss);
+    }
+  }
+
+  void _dismiss() {
+    if (!mounted || _fading) return;
+    setState(() => _fading = true);
+    Future.delayed(_fade, () {
+      if (mounted) setState(() => _visible = false);
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    if (!_visible) return widget.child;
+    return Stack(
+      children: [
+        widget.child,
+        Positioned.fill(
+          child: IgnorePointer(
+            ignoring: _fading,
+            child: AnimatedOpacity(
+              opacity: _fading ? 0 : 1,
+              duration: _fade,
+              child: GestureDetector(
+                onTap: _dismiss,
+                child: _KingSplashBody(title: widget.title, hold: _hold),
+              ),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class _KingSplashBody extends StatelessWidget {
+  final String title;
+  final Duration hold;
+
+  const _KingSplashBody({required this.title, required this.hold});
+
+  @override
+  Widget build(BuildContext context) {
+    return Material(
+      color: KingColors.ground,
+      child: Column(
+        children: [
+          const KingHazardStripe(height: 8),
+          Expanded(
+            child: Center(
+              child: SingleChildScrollView(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    const KingEmblem(size: 220),
+                    const SizedBox(height: 28),
+                    Text(
+                      title.toUpperCase(),
+                      textAlign: TextAlign.center,
+                      style: const TextStyle(
+                        color: KingColors.text,
+                        fontSize: 40,
+                        fontWeight: FontWeight.w900,
+                        letterSpacing: 8,
+                      ),
+                    ),
+                    const SizedBox(height: 24),
+                    Container(
+                      width: 320,
+                      height: 14,
+                      padding: const EdgeInsets.all(2),
+                      decoration: BoxDecoration(
+                        border: Border.all(color: KingColors.orange),
+                      ),
+                      child: TweenAnimationBuilder<double>(
+                        tween: Tween(begin: 0.05, end: 1),
+                        duration: hold,
+                        curve: Curves.easeInOut,
+                        builder: (context, v, _) => Align(
+                          alignment: Alignment.centerLeft,
+                          child: FractionallySizedBox(
+                            widthFactor: v,
+                            child: const KingHazardStripe(height: 8),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+          const KingHazardStripe(height: 8),
+        ],
+      ),
+    );
+  }
+}

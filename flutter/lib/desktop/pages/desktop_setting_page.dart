@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_hbb/common.dart';
 import 'package:flutter_hbb/common/widgets/audio_input.dart';
+import 'package:flutter_hbb/common/widgets/king_widgets.dart';
 import 'package:flutter_hbb/common/widgets/setting_widgets.dart';
 import 'package:flutter_hbb/consts.dart';
 import 'package:flutter_hbb/desktop/pages/desktop_home_page.dart';
@@ -284,6 +285,7 @@ class _DesktopSettingPageState extends State<DesktopSettingPage>
             width: _kTabWidth,
             child: Column(
               children: [
+                const KingHazardStripe(),
                 _header(context),
                 Flexible(child: _listView(tabs: _settingTabs())),
               ],
@@ -340,6 +342,7 @@ class _DesktopSettingPageState extends State<DesktopSettingPage>
             child: settingsText,
           ).marginOnly(left: 20, top: 10),
         const Spacer(),
+        const KingGearPair(size: 22).marginOnly(right: 14, top: 10),
       ],
     );
   }

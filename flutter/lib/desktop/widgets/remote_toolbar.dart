@@ -327,8 +327,8 @@ class ToolbarState {
 class _ToolbarTheme {
   static const Color blueColor = MyTheme.button;
   static const Color hoverBlueColor = MyTheme.accent;
-  static Color inactiveColor = Colors.grey[800]!;
-  static Color hoverInactiveColor = Colors.grey[850]!;
+  static Color inactiveColor = const Color(0xFF2A211A);
+  static Color hoverInactiveColor = const Color(0xFF3A2C20);
 
   static const Color redColor = Colors.redAccent;
   static const Color hoverRedColor = Colors.red;
@@ -351,7 +351,9 @@ class _ToolbarTheme {
   static const double menuButtonBorderRadius = 3.0;
 
   static Color borderColor(BuildContext context) =>
-      MyTheme.color(context).border3 ?? MyTheme.border;
+      MyTheme.currentThemeMode() == ThemeMode.dark
+          ? const Color(0xFF3A2C20)
+          : (MyTheme.color(context).border3 ?? MyTheme.border);
 
   static Color? dividerColor(BuildContext context) =>
       MyTheme.color(context).divider;

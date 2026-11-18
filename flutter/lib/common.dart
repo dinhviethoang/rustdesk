@@ -558,7 +558,7 @@ class MyTheme {
     listTileTheme: listTileTheme,
     menuBarTheme: MenuBarThemeData(
         style: MenuStyle(
-            backgroundColor: MaterialStatePropertyAll(Color(0xFF121212)))),
+            backgroundColor: MaterialStatePropertyAll(Color(0xFF12100E)))),
     colorScheme: ColorScheme.dark(
       primary: accent,
       secondary: accent,

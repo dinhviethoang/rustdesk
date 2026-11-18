@@ -6,6 +6,7 @@ import 'package:bot_toast/bot_toast.dart';
 import 'package:desktop_multi_window/desktop_multi_window.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_hbb/common/widgets/king_widgets.dart';
 import 'package:flutter_hbb/common/widgets/overlay.dart';
 import 'package:flutter_hbb/desktop/pages/desktop_tab_page.dart';
 import 'package:flutter_hbb/desktop/pages/install_page.dart';
@@ -531,6 +532,10 @@ class _AppState extends State<App> with WidgetsBindingObserver {
                   if ((isDesktop && desktopType == DesktopType.main) ||
                       isWebDesktop) {
                     child = keyListenerBuilder(context, child);
+                  }
+                  if (isDesktop && desktopType == DesktopType.main) {
+                    child = KingSplashOverlay(
+                        title: bind.mainGetAppNameSync(), child: child);
                   }
                   if (isLinux) {
                     return buildVirtualWindowFrame(context, child);
